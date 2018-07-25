@@ -88,9 +88,9 @@ contract NextyBonus {
         require(!reEntrancyMutex);
         require(_amount <= totalAmount);
         reEntrancyMutex = true;
+        totalAmount= totalAmount.sub(_amount);
         owner.transfer(_amount);
         reEntrancyMutex = false;
-        totalAmount= totalAmount.sub(_amount);
         emit ownerWithdrawSuccess(_amount);
     }
     
