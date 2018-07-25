@@ -123,7 +123,7 @@ contract NextyBonus {
     }
     
     function createLockedAmount(address _address, uint256 _amount) onlyOwner public {
-        require(_amount < totalAmount);
+        require(_amount <= totalAmount);
         require(whiteList[_address]);
         
         uint256 newFixedAmount= _amount.mul(FIXED_PERCENT).div(100);
