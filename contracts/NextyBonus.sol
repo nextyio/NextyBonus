@@ -141,16 +141,12 @@ contract NextyBonus {
         for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
             if ((bonusAmount[_address][i].lockStatus == StatusType.Locked) && 
             (bonusAmount[_address][i].endTime < now)){
-                
                 bonusAmount[_address][i].lockStatus == StatusType.Unlocked;
-                
             }
             
             if ((fixedAmount[_address][i].lockStatus == StatusType.Locked) && 
             (fixedAmount[_address][i].endTime < now)){
-                
                 fixedAmount[_address][i].lockStatus == StatusType.Unlocked;
-                
             }
         }
     }
@@ -169,6 +165,7 @@ contract NextyBonus {
                 removedAmount= removedAmount.add(bonusAmount[_address][i].value);
             }
         }
+
         totalAmount= totalAmount.add(removedAmount);
         emit RemovedSuccess(removedAmount);
     }
@@ -177,6 +174,7 @@ contract NextyBonus {
     function getLockedAmount(address _address) public view returns(uint256) {
         updateStatus(_address);
         uint256 lockedAmount= 0;
+
         for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
             //if still Locked
             if (bonusAmount[_address][i].lockStatus == StatusType.Locked) {
@@ -187,12 +185,14 @@ contract NextyBonus {
                 lockedAmount= lockedAmount.add(fixedAmount[_address][i].value);
             }
         }
+
         return lockedAmount;
     }
     
     function getUnlockedAmount(address _address) public view returns(uint256) {
         updateStatus(_address);
         uint256 unlockedAmount= 0;
+
         for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
             //if Unlocked
             if (bonusAmount[_address][i].lockStatus == StatusType.Unlocked) {
@@ -203,12 +203,14 @@ contract NextyBonus {
                 unlockedAmount= unlockedAmount.add(fixedAmount[_address][i].value);
             }
         }
+
         return unlockedAmount;
     }
     
     function getWithdrawnAmount(address _address) public view returns(uint256) {
         updateStatus(_address);
         uint256 withdrawnAmount= 0;
+
         for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
             //if Withdrawn
             if (bonusAmount[_address][i].lockStatus == StatusType.Withdrawn) {
@@ -219,6 +221,7 @@ contract NextyBonus {
                 withdrawnAmount= withdrawnAmount.add(fixedAmount[_address][i].value);
             }
         }
+        
         return withdrawnAmount;
     }
     
