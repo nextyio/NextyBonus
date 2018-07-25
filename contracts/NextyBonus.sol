@@ -55,13 +55,13 @@ contract NextyBonus {
     }
     
     //Events
-    event changePercentSuccess(uint256 _percent);
-    event addMemberSuccess(address _address, uint256 _sorter);
-    event sentSuccess(address _address, uint256 _amount);
-    event removedSuccess(uint256 _amount);
-    event ownerWithdrawSuccess(uint256 _amount);
+    event ChangePercentSuccess(uint256 _percent);
+    event AddMemberSuccess(address _address, uint256 _sorter);
+    event SentSuccess(address _address, uint256 _amount);
+    event RemovedSuccess(uint256 _amount);
+    event OwnerWithdrawSuccess(uint256 _amount);
     
-    event memberWithdrawSuccess(address _address, uint256 _amount);
+    event MemberWithdrawSuccess(address _address, uint256 _amount);
     
     //Owner's Functions
 
@@ -81,7 +81,7 @@ contract NextyBonus {
     function setFixedPercent(uint256 _percent) onlyOwner public {
         require((0 <= _percent) && (_percent <= 100));
         FIXED_PERCENT=_percent;
-        emit changePercentSuccess(_percent);
+        emit ChangePercentSuccess(_percent);
     }
     
     function ownerWithdraw(uint256 _amount) onlyOwner public {
@@ -91,14 +91,14 @@ contract NextyBonus {
         totalAmount= totalAmount.sub(_amount);
         owner.transfer(_amount);
         reEntrancyMutex = false;
-        emit ownerWithdrawSuccess(_amount);
+        emit OwnerWithdrawSuccess(_amount);
     }
     
     function addMember(address _address) onlyOwner public {
         require(!whiteList[_address]);
         member.push(_address);
         whiteList[_address]= true;
-        emit addMemberSuccess(_address, member.length-1);
+        emit AddMemberSuccess(_address, member.length-1);
     }
     
     function createFixedAmount(address _address, uint256 _amount) private {
@@ -139,7 +139,7 @@ contract NextyBonus {
         
         totalAmount= totalAmount.sub(_amount);
         
-        emit sentSuccess(_address, _amount);
+        emit SentSuccess(_address, _amount);
     }
     
     function updateStatus(address _address) public view{
@@ -175,7 +175,7 @@ contract NextyBonus {
             }
         }
         totalAmount= totalAmount.add(removedAmount);
-        emit removedSuccess(removedAmount);
+        emit RemovedSuccess(removedAmount);
     }
     
     //Members Functions
@@ -250,7 +250,7 @@ contract NextyBonus {
         reEntrancyMutex = true;
         _address.transfer(withdrawAmount);
         reEntrancyMutex = false; 
-        emit memberWithdrawSuccess(_address, withdrawAmount);
+        emit MemberWithdrawSuccess(_address, withdrawAmount);
         
     }
 }
