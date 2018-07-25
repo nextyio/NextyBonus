@@ -10,48 +10,35 @@ import './SafeMath.sol';
 contract NextyBonus {
     using SafeMath for uint256;
     
-    uint256 public constant BONUS_LOCK_DURATION= 6*30*24*60*60;
-    uint256 public constant CONTRACT_ENDTIME= 1577836800;
+    uint256 public constant BONUS_REMOVEALBE_DURATION= 180*24*60*60; // 180 days in second
+    uint256 public constant LOCK_DURATION= 365*24*60*60; // 365 days in second
+    //uint256 public constant CONTRACT_ENDTIME= 1577836800;
     
-    enum ActionType {
-        AddMember,
-        RemoveMember,
-        GiveFixed,
-        GiveBonus,
-        GetBack,
-        Deposit,
-        Withdraw
-    }
+    uint256 public FIXED_PERCENT; //not constant
+    uint256 public totalAmount= 0;
     
     enum StatusType {
-        Pending,
-        Completed
+        Locked,
+        Unlocked,
+        Withdrawn,
+        Removed     //Bonus amount only
     }
-    
-    struct LogAtribute {
-        ActionType action;
-        uint256 value;
+
+    struct LockAtribute {
         uint256 time;
         uint256 endTime;
-        bool status; //0 Pending 1 Completed
-    }
-    
-    struct MemberAtribute {
-        bool exist;
-        uint256 id;
+        uint256 value;
+        StatusType lockStatus;
     }
     
     address public owner;
     
-    uint256 totalAmount= 0;
-    uint256 totalMember= 0;
+    address[] public member;
     
-    address[] addressList;
+    mapping(address => bool) public whiteList;
     
-    mapping(address => MemberAtribute) member;
-    mapping(uint256 => bool) id;
-    
-    mapping(address => LogAtribute[]) log;
+    mapping(address => LockAtribute[]) public fixedAmount;
+    mapping(address => LockAtribute[]) public bonusAmount;
     
     //Modifiers
 
@@ -61,153 +48,197 @@ contract NextyBonus {
     }
     
     modifier onlyMember() {
-        require(member[msg.sender].exist);
+        require(whiteList[msg.sender]);
         _;
     }
     
     //Events
+    event changePercentSuccess(uint256 _percent);
+    event addMemberSuccess(address _address, uint256 _sorter);
+    event sentSuccess(address _address, uint256 _amount);
+    event removedSuccess(uint256 _amount);
     event ownerWithdrawSuccess(uint256 _amount);
-    event addMemberSuccess(address _address);
-    event removeMemberSuccess(address _address);
-    event getBackSuccess(uint256 _amount);
-    event giveBonusSuccess(address _to);
-    event giveFixedSuccess(address _to);
-    event unlockedWithdraw(address _address, uint256 _amount);
+    
+    event memberWithdrawSuccess(address _address, uint256 _amount);
     
     //Owner's Functions
 
-    constructor () public{ 
+    constructor (uint256 _percent) public{ 
         owner= msg.sender;
-        addMember(msg.sender);
+        setFixedPercent(_percent);
+        addMember(msg.sender); // owner at 1st place in the member array
     }
     
     function () public payable {
         totalAmount= totalAmount.add(msg.value);
     }
     
-    function deposit() public payable {
-        totalAmount= totalAmount.add(msg.value);
-    }
-    
-    function getTotalAmount() public onlyOwner view returns (uint256){
-        return this.balance;
+    function setFixedPercent(uint256 _percent) onlyOwner public {
+        require((0 <= _percent) && (_percent <= 100));
+        FIXED_PERCENT=_percent;
+        emit changePercentSuccess(_percent);
     }
     
     function ownerWithdraw(uint256 _amount) onlyOwner public {
         require(_amount <= totalAmount);
         owner.transfer(_amount);
-        totalAmount.sub(_amount);
+        totalAmount= totalAmount.sub(_amount);
         emit ownerWithdrawSuccess(_amount);
     }
     
-    function getMemberList() onlyOwner public view returns(address[]){
-        return addressList;
-    }
-    
     function addMember(address _address) onlyOwner public {
-        require(!member[_address].exist);
-        totalMember++;
-        addressList.push(_address);
-        member[_address].exist= true;
-        member[_address].id= totalMember;
-        LogAtribute memory newLog;
-        newLog.action = ActionType.AddMember;
-        newLog.value= totalMember;
-        newLog.time= now;
-        newLog.status= true;
-        log[_address].push(newLog);
-        emit addMemberSuccess(_address);
+        require(!whiteList[_address]);
+        member.push(_address);
+        whiteList[_address]= true;
+        emit addMemberSuccess(_address, member.length-1);
     }
     
-    function giveBonus(address _to, uint256 _amount) onlyOwner public payable {
-        require(totalAmount >=  _amount);
-        totalAmount.sub(_amount);
-        LogAtribute memory newLog;
-        newLog.action= ActionType.GiveBonus;
-        newLog.value= _amount;
-        newLog.time= now;
-        newLog.endTime= now.add(BONUS_LOCK_DURATION);
-        newLog.status= false;
-        log[_to].push(newLog);
-        emit giveBonusSuccess(_to);
+    function createFixedAmount(address _address, uint256 _amount) private {
+        uint256 lockDuration= LOCK_DURATION; //in second
+        
+        LockAtribute memory newAmount = LockAtribute({
+            time: now,
+            endTime: now + lockDuration,
+            value: _amount,
+            lockStatus: StatusType.Locked
+        });
+        
+        fixedAmount[_address].push(newAmount);
     }
     
-    function giveFixed(address _to, uint256 _amount) onlyOwner public {
-        require(totalAmount >=  _amount);
-        totalAmount.sub(_amount);
-        LogAtribute memory newLog;
-        newLog.action= ActionType.GiveFixed;
-        newLog.value= _amount;
-        newLog.time= now;
-        newLog.endTime= CONTRACT_ENDTIME;
-        newLog.status= false;
-        log[_to].push(newLog);
-        emit giveFixedSuccess(_to);
+    function createBonusAmount(address _address, uint256 _amount) private {
+        uint256 lockDuration= LOCK_DURATION; //in second
+        
+        LockAtribute memory newAmount = LockAtribute({
+            time: now,
+            endTime: now + lockDuration,
+            value: _amount,
+            lockStatus: StatusType.Locked
+        });
+        
+        bonusAmount[_address].push(newAmount);
     }
     
-    function getBack(address _from) onlyOwner public {
-        require(now < CONTRACT_ENDTIME);
-        uint256 getBackTotal= 0;
-        for (uint256 i= 0; i < log[_from].length; i++) 
-        if ((!log[_from][i].status) && (log[_from][i].endTime > now)){
-            getBackTotal.add(log[_from][i].value);
-            log[_from][i].status= true;
+    function createLockedAmount(address _address, uint256 _amount) onlyOwner public {
+        require(_amount < totalAmount);
+        require(whiteList[_address]);
+        
+        uint256 newFixedAmount= _amount.mul(FIXED_PERCENT).div(100);
+        uint256 newBonusAmount= _amount.sub(newFixedAmount);
+        
+        createFixedAmount(_address, newFixedAmount);
+        createBonusAmount(_address, newBonusAmount);
+        
+        totalAmount= totalAmount.sub(_amount);
+        
+        emit sentSuccess(_address, _amount);
+    }
+    
+    function updateStatus(address _address) public view{
+        for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
+            if ((bonusAmount[_address][i].lockStatus == StatusType.Locked) && 
+            (bonusAmount[_address][i].endTime < now)){
+                
+                bonusAmount[_address][i].lockStatus == StatusType.Unlocked;
+                
+            }
+            
+            if ((fixedAmount[_address][i].lockStatus == StatusType.Locked) && 
+            (fixedAmount[_address][i].endTime < now)){
+                
+                fixedAmount[_address][i].lockStatus == StatusType.Unlocked;
+                
+            }
         }
-        totalAmount.add(getBackTotal);
+    }
+    
+    function removeBonusAmount(address _address) onlyOwner public {
+        require(whiteList[_address]);
+        uint256 removedAmount= 0;
         
-        LogAtribute memory newLog;
-        newLog.action= ActionType.GetBack;
-        newLog.value= getBackTotal;
-        newLog.time= now;
-        newLog.endTime= CONTRACT_ENDTIME;
-        newLog.status= true;
-        log[_from].push(newLog);
+        updateStatus(_address);
         
-        emit getBackSuccess(getBackTotal);
+        // search all bonusAmount sent to this _address
+        for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
+            //if still removeable, remove and add amount into totalAmount    
+            if (bonusAmount[_address][i].time + BONUS_REMOVEALBE_DURATION < now) {
+                bonusAmount[_address][i].lockStatus= StatusType.Removed;
+                removedAmount= removedAmount.add(bonusAmount[_address][i].value);
+            }
+        }
+        totalAmount= totalAmount.add(removedAmount);
+        emit removedSuccess(removedAmount);
     }
     
     //Members Functions
-    
-    function withdrawUnlockedAmount() onlyMember public {
-        address _address= msg.sender;
-        uint256 unlockedAmount= 0;
-        for (uint256 i= 0; i < log[_address].length; i++) 
-        if ((!log[_address][i].status) && (log[_address][i].endTime < now)){
-            if ((log[_address][i].action == ActionType.GiveFixed) || (log[_address][i].action == ActionType.GiveBonus)){
-                unlockedAmount.add(log[_address][i].value);
-                log[_address][i].status= true;
+    function getLockedAmount(address _address) public view returns(uint256) {
+        updateStatus(_address);
+        uint256 lockedAmount= 0;
+        for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
+            //if still Locked
+            if (bonusAmount[_address][i].lockStatus == StatusType.Locked) {
+                lockedAmount= lockedAmount.add(bonusAmount[_address][i].value);
+            }
+            
+            if (fixedAmount[_address][i].lockStatus == StatusType.Locked) {
+                lockedAmount= lockedAmount.add(fixedAmount[_address][i].value);
             }
         }
-        require(unlockedAmount > 0);
-        
-        LogAtribute memory newLog;
-        newLog.action= ActionType.Withdraw;
-        newLog.value= unlockedAmount;
-        newLog.time= now;
-        newLog.endTime= CONTRACT_ENDTIME;
-        newLog.status= true;
-        log[_address].push(newLog);
-        msg.sender.transfer(unlockedAmount);
-        emit unlockedWithdraw(_address, unlockedAmount);
+        return lockedAmount;
     }
     
-    function getLogs(address _address) public view returns(uint256[], uint256[], uint256[], uint256[], bool[]) {
-        require(member[_address].exist);
-        bool access= (owner == msg.sender) || (_address == msg.sender);
-        require(access);
-        uint256[] memory action;
-        uint256[] memory value;
-        uint256[] memory time;
-        uint256[] memory endTime;
-        bool[] memory status;
-        for (uint256 i= 0; i < log[_address].length; i++) {
-            action[i]= uint256(log[_address][i].action);
-            value[i]= log[_address][i].value;
-            time[i]= log[_address][i].time;
-            endTime[i]= log[_address][i].endTime;
-            status[i]= log[_address][i].status;
+    function getUnlockedAmount(address _address) public view returns(uint256) {
+        updateStatus(_address);
+        uint256 unlockedAmount= 0;
+        for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
+            //if Unlocked
+            if (bonusAmount[_address][i].lockStatus == StatusType.Unlocked) {
+                unlockedAmount= unlockedAmount.add(bonusAmount[_address][i].value);
+            }
+            
+            if (fixedAmount[_address][i].lockStatus == StatusType.Unlocked) {
+                unlockedAmount= unlockedAmount.add(fixedAmount[_address][i].value);
+            }
         }
-        return (action, value, time, endTime, status);
+        return unlockedAmount;
     }
     
+    function getWithdrawnAmount(address _address) public view returns(uint256) {
+        updateStatus(_address);
+        uint256 withdrawnAmount= 0;
+        for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
+            //if Withdrawn
+            if (bonusAmount[_address][i].lockStatus == StatusType.Withdrawn) {
+                withdrawnAmount= withdrawnAmount.add(bonusAmount[_address][i].value);
+            }
+            
+            if (fixedAmount[_address][i].lockStatus == StatusType.Withdrawn) {
+                withdrawnAmount= withdrawnAmount.add(fixedAmount[_address][i].value);
+            }
+        }
+        return withdrawnAmount;
+    }
+    
+    function memberWithdraw() onlyMember public {
+        address _address=msg.sender;
+        uint256 withdrawAmount= 0;
+        updateStatus(_address);
+        
+        for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
+            //if Unlocked
+            if (bonusAmount[_address][i].lockStatus == StatusType.Unlocked) {
+                bonusAmount[_address][i].lockStatus= StatusType.Withdrawn;
+                withdrawAmount= withdrawAmount.add(bonusAmount[_address][i].value);
+            }
+            
+            if (fixedAmount[_address][i].lockStatus == StatusType.Unlocked) {
+                fixedAmount[_address][i].lockStatus= StatusType.Withdrawn;
+                withdrawAmount= withdrawAmount.add(fixedAmount[_address][i].value);
+            }
+        }
+        
+        require(withdrawAmount > 0);
+        _address.transfer(withdrawAmount);
+        emit memberWithdrawSuccess(_address, withdrawAmount);
+    }
 }
