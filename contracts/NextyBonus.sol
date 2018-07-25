@@ -52,7 +52,7 @@ contract NextyBonus {
 
     event ChangePercentSuccess(uint256 _percent);
     event AddMemberSuccess(address _address, uint256 _sorter);
-    event SentSuccess(address _address, uint256 _amount);
+    event CreatedSuccess(address _address, uint256 _amount);
     event RemovedSuccess(uint256 _amount);
     event OwnerWithdrawSuccess(uint256 _amount);
     
@@ -134,7 +134,7 @@ contract NextyBonus {
         
         totalAmount= totalAmount.sub(_amount);
         
-        emit SentSuccess(_address, _amount);
+        emit CreatedSuccess(_address, _amount);
     }
     
     function updateStatus(address _address) public view{
