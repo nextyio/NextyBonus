@@ -182,6 +182,34 @@ contract NextyBonus {
     }
     
     //Members Functions
+    
+    function memberWithdraw() onlyMember public {
+        require(!reEntrancyMutex);
+        address _address=msg.sender;
+        uint256 withdrawAmount= 0;
+        updateStatus(_address);
+        
+        for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
+            //if Unlocked
+            if (bonusAmount[_address][i].lockStatus == StatusType.Unlocked) {
+                bonusAmount[_address][i].lockStatus= StatusType.Withdrawn;
+                withdrawAmount= withdrawAmount.add(bonusAmount[_address][i].value);
+            }
+            
+            if (fixedAmount[_address][i].lockStatus == StatusType.Unlocked) {
+                fixedAmount[_address][i].lockStatus= StatusType.Withdrawn;
+                withdrawAmount= withdrawAmount.add(fixedAmount[_address][i].value);
+            }
+        }
+        
+        require(withdrawAmount > 0);
+        reEntrancyMutex = true;
+        _address.transfer(withdrawAmount);
+        reEntrancyMutex = false; 
+        emit MemberWithdrawSuccess(_address, withdrawAmount);
+    }
+    
+    //Public Functions
 
     function getLockedAmount(address _address) public view returns(uint256) {
         updateStatus(_address);
@@ -237,29 +265,36 @@ contract NextyBonus {
         return withdrawnAmount;
     }
     
-    function memberWithdraw() onlyMember public {
-        require(!reEntrancyMutex);
-        address _address=msg.sender;
-        uint256 withdrawAmount= 0;
-        updateStatus(_address);
+    function getFixedHistory(address _address) public view returns(uint256[], uint256[], uint256[], StatusType[]){
+        uint256[] memory time;
+        uint256[] memory endTime;
+        uint256[] memory value;
+        StatusType[] memory lockStatus;
+        
+        for (uint256 i= 0; i< fixedAmount[_address].length; i++) {
+            time[i]= fixedAmount[_address][i].time;
+            endTime[i]= fixedAmount[_address][i].endTime;
+            value[i]= fixedAmount[_address][i].value;
+            lockStatus[i]= fixedAmount[_address][i].lockStatus;
+        }  
+        
+        return (time, endTime, value, lockStatus);
+    }
+    
+    function getBonusHistory(address _address) public view returns(uint256[], uint256[], uint256[], StatusType[]){
+        uint256[] memory time;
+        uint256[] memory endTime;
+        uint256[] memory value;
+        StatusType[] memory lockStatus;
         
         for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
-            //if Unlocked
-            if (bonusAmount[_address][i].lockStatus == StatusType.Unlocked) {
-                bonusAmount[_address][i].lockStatus= StatusType.Withdrawn;
-                withdrawAmount= withdrawAmount.add(bonusAmount[_address][i].value);
-            }
-            
-            if (fixedAmount[_address][i].lockStatus == StatusType.Unlocked) {
-                fixedAmount[_address][i].lockStatus= StatusType.Withdrawn;
-                withdrawAmount= withdrawAmount.add(fixedAmount[_address][i].value);
-            }
-        }
+            time[i]= bonusAmount[_address][i].time;
+            endTime[i]= bonusAmount[_address][i].endTime;
+            value[i]= bonusAmount[_address][i].value;
+            lockStatus[i]= bonusAmount[_address][i].lockStatus;
+        }  
         
-        require(withdrawAmount > 0);
-        reEntrancyMutex = true;
-        _address.transfer(withdrawAmount);
-        reEntrancyMutex = false; 
-        emit MemberWithdrawSuccess(_address, withdrawAmount);
+        return (time, endTime, value, lockStatus);
     }
+    
 }
