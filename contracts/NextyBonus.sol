@@ -134,24 +134,6 @@ contract NextyBonus {
         emit sentSuccess(_address, _amount);
     }
     
-    function updateStatus(address _address) public view{
-        for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
-            if ((bonusAmount[_address][i].lockStatus == StatusType.Locked) && 
-            (bonusAmount[_address][i].endTime < now)){
-                
-                bonusAmount[_address][i].lockStatus == StatusType.Unlocked;
-                
-            }
-            
-            if ((fixedAmount[_address][i].lockStatus == StatusType.Locked) && 
-            (fixedAmount[_address][i].endTime < now)){
-                
-                fixedAmount[_address][i].lockStatus == StatusType.Unlocked;
-                
-            }
-        }
-    }
-    
     function removeBonusAmount(address _address) onlyOwner public {
         require(whiteList[_address]);
         uint256 removedAmount= 0;
@@ -171,6 +153,50 @@ contract NextyBonus {
     }
     
     //Members Functions
+    
+    function memberWithdraw() onlyMember public {
+        address _address=msg.sender;
+        uint256 withdrawAmount= 0;
+        updateStatus(_address);
+        
+        for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
+            //if Unlocked
+            if (bonusAmount[_address][i].lockStatus == StatusType.Unlocked) {
+                bonusAmount[_address][i].lockStatus= StatusType.Withdrawn;
+                withdrawAmount= withdrawAmount.add(bonusAmount[_address][i].value);
+            }
+            
+            if (fixedAmount[_address][i].lockStatus == StatusType.Unlocked) {
+                fixedAmount[_address][i].lockStatus= StatusType.Withdrawn;
+                withdrawAmount= withdrawAmount.add(fixedAmount[_address][i].value);
+            }
+        }
+        
+        require(withdrawAmount > 0);
+        _address.transfer(withdrawAmount);
+        emit memberWithdrawSuccess(_address, withdrawAmount);
+    }
+
+    //Public Functions
+
+    function updateStatus(address _address) public view{
+        for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
+            if ((bonusAmount[_address][i].lockStatus == StatusType.Locked) && 
+            (bonusAmount[_address][i].endTime < now)){
+                
+                bonusAmount[_address][i].lockStatus == StatusType.Unlocked;
+                
+            }
+            
+            if ((fixedAmount[_address][i].lockStatus == StatusType.Locked) && 
+            (fixedAmount[_address][i].endTime < now)){
+                
+                fixedAmount[_address][i].lockStatus == StatusType.Unlocked;
+                
+            }
+        }
+    }
+
     function getLockedAmount(address _address) public view returns(uint256) {
         updateStatus(_address);
         uint256 lockedAmount= 0;
@@ -218,27 +244,5 @@ contract NextyBonus {
         }
         return withdrawnAmount;
     }
-    
-    function memberWithdraw() onlyMember public {
-        address _address=msg.sender;
-        uint256 withdrawAmount= 0;
-        updateStatus(_address);
-        
-        for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
-            //if Unlocked
-            if (bonusAmount[_address][i].lockStatus == StatusType.Unlocked) {
-                bonusAmount[_address][i].lockStatus= StatusType.Withdrawn;
-                withdrawAmount= withdrawAmount.add(bonusAmount[_address][i].value);
-            }
-            
-            if (fixedAmount[_address][i].lockStatus == StatusType.Unlocked) {
-                fixedAmount[_address][i].lockStatus= StatusType.Withdrawn;
-                withdrawAmount= withdrawAmount.add(fixedAmount[_address][i].value);
-            }
-        }
-        
-        require(withdrawAmount > 0);
-        _address.transfer(withdrawAmount);
-        emit memberWithdrawSuccess(_address, withdrawAmount);
-    }
+
 }
