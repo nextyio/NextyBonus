@@ -48,13 +48,15 @@ contract NextyBonus {
         _;
     }
     
-    //Events
+    //Owners Events
 
     event ChangePercentSuccess(uint256 _percent);
     event AddMemberSuccess(address _address, uint256 _sorter);
     event CreatedSuccess(address _address, uint256 _amount);
     event RemovedSuccess(uint256 _amount);
     event OwnerWithdrawSuccess(uint256 _amount);
+
+    //Members Events
     
     event MemberWithdrawSuccess(address _address, uint256 _amount);
     
@@ -151,18 +153,27 @@ contract NextyBonus {
         }
     }
     
-    function removeBonusAmount(address _address) onlyOwner public {
+    function removeSpecificBonusAmount(address _address, uint256 _amountId) private returns(uint256) {
+        //if still removeable, remove and add amount into totalAmount    
+        if (bonusAmount[_address][_amountId].time + BONUS_REMOVEALBE_DURATION < now) {
+            bonusAmount[_address][_amountId].lockStatus= StatusType.Removed;
+            return bonusAmount[_address][_amountId].value;
+        }
+        return 0;
+    }
+    
+    function removeBonusAmount(address _address, bool _isSpecific, uint256 _amountId) onlyOwner public {
         require(whiteList[_address]);
         uint256 removedAmount= 0;
-        
         updateStatus(_address);
         
-        // search all bonusAmount sent to this _address
-        for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
-            //if still removeable, remove and add amount into totalAmount    
-            if (bonusAmount[_address][i].time + BONUS_REMOVEALBE_DURATION < now) {
-                bonusAmount[_address][i].lockStatus= StatusType.Removed;
-                removedAmount= removedAmount.add(bonusAmount[_address][i].value);
+        if (_isSpecific) {
+            require((0 <= _amountId) && (_amountId <  bonusAmount[_address].length));
+            removedAmount= removeSpecificBonusAmount(_address, _amountId);
+        } else {
+            // remove all bonusAmount => search all bonusAmount sent to this _address
+            for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
+                removedAmount= removedAmount.add(removeSpecificBonusAmount(_address, i));
             }
         }
 
@@ -171,6 +182,7 @@ contract NextyBonus {
     }
     
     //Members Functions
+
     function getLockedAmount(address _address) public view returns(uint256) {
         updateStatus(_address);
         uint256 lockedAmount= 0;
@@ -249,6 +261,5 @@ contract NextyBonus {
         _address.transfer(withdrawAmount);
         reEntrancyMutex = false; 
         emit MemberWithdrawSuccess(_address, withdrawAmount);
-        
     }
 }
