@@ -17,6 +17,8 @@ contract NextyBonus {
     uint256 public FIXED_PERCENT; //not constant
     uint256 public totalAmount= 0;
     
+    bool reEntrancyMutex = false;
+    
     enum StatusType {
         Locked,
         Unlocked,
@@ -70,7 +72,10 @@ contract NextyBonus {
     }
     
     function () public payable {
+        require(!reEntrancyMutex);
+        reEntrancyMutex = true; 
         totalAmount= totalAmount.add(msg.value);
+        reEntrancyMutex = false; 
     }
     
     function setFixedPercent(uint256 _percent) onlyOwner public {
@@ -80,8 +85,11 @@ contract NextyBonus {
     }
     
     function ownerWithdraw(uint256 _amount) onlyOwner public {
+        require(!reEntrancyMutex);
         require(_amount <= totalAmount);
+        reEntrancyMutex = true;
         owner.transfer(_amount);
+        reEntrancyMutex = false;
         totalAmount= totalAmount.sub(_amount);
         emit ownerWithdrawSuccess(_amount);
     }
@@ -134,6 +142,24 @@ contract NextyBonus {
         emit sentSuccess(_address, _amount);
     }
     
+    function updateStatus(address _address) public view{
+        for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
+            if ((bonusAmount[_address][i].lockStatus == StatusType.Locked) && 
+            (bonusAmount[_address][i].endTime < now)){
+                
+                bonusAmount[_address][i].lockStatus == StatusType.Unlocked;
+                
+            }
+            
+            if ((fixedAmount[_address][i].lockStatus == StatusType.Locked) && 
+            (fixedAmount[_address][i].endTime < now)){
+                
+                fixedAmount[_address][i].lockStatus == StatusType.Unlocked;
+                
+            }
+        }
+    }
+    
     function removeBonusAmount(address _address) onlyOwner public {
         require(whiteList[_address]);
         uint256 removedAmount= 0;
@@ -153,50 +179,6 @@ contract NextyBonus {
     }
     
     //Members Functions
-    
-    function memberWithdraw() onlyMember public {
-        address _address=msg.sender;
-        uint256 withdrawAmount= 0;
-        updateStatus(_address);
-        
-        for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
-            //if Unlocked
-            if (bonusAmount[_address][i].lockStatus == StatusType.Unlocked) {
-                bonusAmount[_address][i].lockStatus= StatusType.Withdrawn;
-                withdrawAmount= withdrawAmount.add(bonusAmount[_address][i].value);
-            }
-            
-            if (fixedAmount[_address][i].lockStatus == StatusType.Unlocked) {
-                fixedAmount[_address][i].lockStatus= StatusType.Withdrawn;
-                withdrawAmount= withdrawAmount.add(fixedAmount[_address][i].value);
-            }
-        }
-        
-        require(withdrawAmount > 0);
-        _address.transfer(withdrawAmount);
-        emit memberWithdrawSuccess(_address, withdrawAmount);
-    }
-
-    //Public Functions
-
-    function updateStatus(address _address) public view{
-        for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
-            if ((bonusAmount[_address][i].lockStatus == StatusType.Locked) && 
-            (bonusAmount[_address][i].endTime < now)){
-                
-                bonusAmount[_address][i].lockStatus == StatusType.Unlocked;
-                
-            }
-            
-            if ((fixedAmount[_address][i].lockStatus == StatusType.Locked) && 
-            (fixedAmount[_address][i].endTime < now)){
-                
-                fixedAmount[_address][i].lockStatus == StatusType.Unlocked;
-                
-            }
-        }
-    }
-
     function getLockedAmount(address _address) public view returns(uint256) {
         updateStatus(_address);
         uint256 lockedAmount= 0;
@@ -244,5 +226,31 @@ contract NextyBonus {
         }
         return withdrawnAmount;
     }
-
+    
+    function memberWithdraw() onlyMember public {
+        require(!reEntrancyMutex);
+        address _address=msg.sender;
+        uint256 withdrawAmount= 0;
+        updateStatus(_address);
+        
+        for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
+            //if Unlocked
+            if (bonusAmount[_address][i].lockStatus == StatusType.Unlocked) {
+                bonusAmount[_address][i].lockStatus= StatusType.Withdrawn;
+                withdrawAmount= withdrawAmount.add(bonusAmount[_address][i].value);
+            }
+            
+            if (fixedAmount[_address][i].lockStatus == StatusType.Unlocked) {
+                fixedAmount[_address][i].lockStatus= StatusType.Withdrawn;
+                withdrawAmount= withdrawAmount.add(fixedAmount[_address][i].value);
+            }
+        }
+        
+        require(withdrawAmount > 0);
+        reEntrancyMutex = true;
+        _address.transfer(withdrawAmount);
+        reEntrancyMutex = false; 
+        emit memberWithdrawSuccess(_address, withdrawAmount);
+        
+    }
 }
