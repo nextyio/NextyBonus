@@ -1,10 +1,5 @@
 pragma solidity ^0.4.17;
 
-//Epoch timestamp: 1577836800
-//Timestamp in milliseconds: 1577836800000
-//Human time (GMT): Wednesday, 1 January 2020 00:00:00
-//Human time (your time zone): thứ tư, 1 tháng 1 năm 2020 07:00:00 GMT+07:00
-
 import './SafeMath.sol';
 
 contract NextyBonus {
@@ -12,7 +7,6 @@ contract NextyBonus {
     
     uint256 public constant BONUS_REMOVEALBE_DURATION= 180*24*60*60; // 180 days in second
     uint256 public constant LOCK_DURATION= 365*24*60*60; // 365 days in second
-    //uint256 public constant CONTRACT_ENDTIME= 1577836800;
     
     uint256 public FIXED_PERCENT; //not constant
     uint256 public totalAmount= 0;
@@ -55,6 +49,7 @@ contract NextyBonus {
     }
     
     //Events
+    
     event ChangePercentSuccess(uint256 _percent);
     event AddMemberSuccess(address _address, uint256 _sorter);
     event SentSuccess(address _address, uint256 _amount);
