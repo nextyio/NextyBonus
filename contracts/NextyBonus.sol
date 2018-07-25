@@ -49,7 +49,7 @@ contract NextyBonus {
     }
     
     //Events
-    
+
     event ChangePercentSuccess(uint256 _percent);
     event AddMemberSuccess(address _address, uint256 _sorter);
     event SentSuccess(address _address, uint256 _amount);
@@ -75,7 +75,7 @@ contract NextyBonus {
     
     function setFixedPercent(uint256 _percent) onlyOwner public {
         require((0 <= _percent) && (_percent <= 100));
-        FIXED_PERCENT=_percent;
+        FIXED_PERCENT= _percent;
         emit ChangePercentSuccess(_percent);
     }
     
