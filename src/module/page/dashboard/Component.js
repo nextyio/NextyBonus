@@ -22,12 +22,10 @@ export default class extends LoggedInPage {
 
     loadData() {
 
-        this.props.callFunction('AddBetAmount', [50]).then((result) => {
-            console.log("success"+ result) 
-        })
+        this.props.setFixedPercent(10);
 
-        this.props.getBetMulNumber().then((number) => {
-            console.log("betMulNumber" + number)
+        this.props.getMemberList().then((member) => {
+            console.log("Members" + member)
         })
 
         this.props.getBalance().then((balance) => {
@@ -45,52 +43,7 @@ export default class extends LoggedInPage {
         const address = wallet.getAddressString()
 
         return (
-            <div className="p_Profile">
-                <div className="ebp-header-divider">
-
-                </div>
-                <div className="ebp-page content-center">
-                    <Row>
-                        <Col span={12} style={{'display':'block'}}>
-                            <h1>{parseFloat(this.state.fundBonus).toFixed(2)} NTY </h1>
-                            <span className="text-stat">Reward pool</span>
-                        </Col>
-                        <Col xs={24} sm={24} md={24} lg={0} xl={0}/>
-                        <Col span={12}>
-                            <h1>{parseFloat(this.state.fund).toFixed(2)} NTY</h1>
-                            <span className="text-stat">Total Smart Staking amount</span>
-                        </Col>
-                    </Row>
-                    <div className="ebp-header-divider dashboard-rate-margin">
-
-                    </div>
-
-                    <div><span className="text-stat">Current reward rate:</span></div>
-
-                    <Row>
-                        <Col span={6}>
-                            <h1>{parseFloat(this.state.bonusPackage1).toFixed(2)} %</h1>
-                            7 days
-                        </Col>
-                        <Col xs={24} sm={24} md={24} lg={0} xl={0}/>
-                        <Col span={6}>
-                            <h1>{parseFloat(this.state.bonusPackage2).toFixed(2)} %</h1>
-                            30 days
-                        </Col>
-                        <Col xs={24} sm={24} md={24} lg={0} xl={0}/>
-                        <Col span={6}>
-                            <h1>{parseFloat(this.state.bonusPackage3).toFixed(2)} %</h1>
-                            90 days
-                        </Col>
-                        <Col xs={24} sm={24} md={24} lg={0} xl={0}/>
-                        <Col span={6}>
-                            <h1>{parseFloat(this.state.bonusPackage4).toFixed(2)} %</h1>
-                            180 days
-                        </Col>
-                        <Col xs={24} sm={24} md={24} lg={0} xl={0}/>
-                    </Row>
-                </div>
-            </div>
+            <div> test </div>
         )
     }
 

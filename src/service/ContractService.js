@@ -56,15 +56,22 @@ export default class extends BaseService {
         return gas
     }
 
-    async getBetMulNumber() {
+    async getMemberList() {
         const storeUser = this.store.getState().user
         let {contract} = storeUser.profile
-
         if (!contract) {
             return
         }
+        return contract.FIXED_PERCENT().toString()
+    }
 
-        return contract.betMulNumber().toString();
+    setFixedPercent(_percent) {
+        const storeUser = this.store.getState().user
+        let {contract} = storeUser.profile
+        if (!contract) {
+            return
+        }
+        return contract.setFixedPercent(_percent);
     }
 
 }
