@@ -143,12 +143,12 @@ contract NextyBonus {
         for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
             if ((bonusAmount[_address][i].lockStatus == StatusType.Locked) && 
             (bonusAmount[_address][i].endTime < now)){
-                bonusAmount[_address][i].lockStatus == StatusType.Unlocked;
+                bonusAmount[_address][i].lockStatus= StatusType.Unlocked;
             }
             
             if ((fixedAmount[_address][i].lockStatus == StatusType.Locked) && 
             (fixedAmount[_address][i].endTime < now)){
-                fixedAmount[_address][i].lockStatus == StatusType.Unlocked;
+                fixedAmount[_address][i].lockStatus= StatusType.Unlocked;
             }
         }
     }
