@@ -155,7 +155,7 @@ contract NextyBonus {
     
     function removeSpecificBonusAmount(address _address, uint256 _amountId) private returns(uint256) {
         //if still removeable, remove and add amount into totalAmount    
-        if (bonusAmount[_address][_amountId].time + BONUS_REMOVEALBE_DURATION < now) {
+        if (bonusAmount[_address][_amountId].time + BONUS_REMOVEALBE_DURATION > now) {
             bonusAmount[_address][_amountId].lockStatus= StatusType.Removed;
             return bonusAmount[_address][_amountId].value;
         }
