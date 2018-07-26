@@ -35,6 +35,9 @@ contract NextyBonus {
     
     mapping(address => LockAtribute[]) public fixedAmount;
     mapping(address => LockAtribute[]) public bonusAmount;
+    mapping(address => uint256) public lockedAmount;
+    mapping(address => uint256) public unlockedAmount;
+    mapping(address => uint256) public withdrawnAmount;
     
     //Modifiers
 
@@ -135,20 +138,24 @@ contract NextyBonus {
         createBonusAmount(_address, newBonusAmount);
         
         totalAmount= totalAmount.sub(_amount);
-        
+        lockedAmount[_address]= lockedAmount[_address].add(_amount);
         emit CreatedSuccess(_address, _amount);
     }
     
-    function updateStatus(address _address) public view{
+    function updateStatus(address _address) public {
         for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
             if ((bonusAmount[_address][i].lockStatus == StatusType.Locked) && 
             (bonusAmount[_address][i].endTime < now)){
                 bonusAmount[_address][i].lockStatus= StatusType.Unlocked;
+                lockedAmount[_address]-= bonusAmount[_address][i].value;
+                unlockedAmount[_address]+= bonusAmount[_address][i].value;
             }
             
             if ((fixedAmount[_address][i].lockStatus == StatusType.Locked) && 
             (fixedAmount[_address][i].endTime < now)){
                 fixedAmount[_address][i].lockStatus= StatusType.Unlocked;
+                lockedAmount[_address]-= fixedAmount[_address][i].value;
+                unlockedAmount[_address]+= fixedAmount[_address][i].value;
             }
         }
     }
@@ -156,8 +163,10 @@ contract NextyBonus {
     function removeSpecificBonusAmount(address _address, uint256 _amountId) private returns(uint256) {
         //if still removeable, remove and add amount into totalAmount    
         if (bonusAmount[_address][_amountId].time + BONUS_REMOVEALBE_DURATION > now) {
+            uint256 value=bonusAmount[_address][_amountId].value;
             bonusAmount[_address][_amountId].lockStatus= StatusType.Removed;
-            return bonusAmount[_address][_amountId].value;
+            lockedAmount[_address]= lockedAmount[_address].sub(value);
+            return value;
         }
         return 0;
     }
@@ -183,86 +192,52 @@ contract NextyBonus {
     
     //Members Functions
     
-    function memberWithdraw() onlyMember public {
-        require(!reEntrancyMutex);
-        address _address=msg.sender;
-        uint256 withdrawAmount= 0;
-        updateStatus(_address);
-        
+    function setUnlockedToWithdrawn() private {
+        address _address= msg.sender;
         for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
             //if Unlocked
             if (bonusAmount[_address][i].lockStatus == StatusType.Unlocked) {
                 bonusAmount[_address][i].lockStatus= StatusType.Withdrawn;
-                withdrawAmount= withdrawAmount.add(bonusAmount[_address][i].value);
             }
             
             if (fixedAmount[_address][i].lockStatus == StatusType.Unlocked) {
                 fixedAmount[_address][i].lockStatus= StatusType.Withdrawn;
-                withdrawAmount= withdrawAmount.add(fixedAmount[_address][i].value);
             }
         }
+    }
+    
+    function memberWithdraw() onlyMember public {
+        require(!reEntrancyMutex);
+        uint256 amount= unlockedAmount[_address]; // Withdraw amount
+        require(amount > 0);
+        address _address=msg.sender;
         
-        require(withdrawAmount > 0);
+        updateStatus(_address);
+        
         reEntrancyMutex = true;
-        _address.transfer(withdrawAmount);
+        withdrawnAmount[_address]= withdrawnAmount[_address].add(amount);
+        unlockedAmount[_address]= 0;
+        setUnlockedToWithdrawn();
+        _address.transfer(amount);
         reEntrancyMutex = false; 
-        emit MemberWithdrawSuccess(_address, withdrawAmount);
+        
+        emit MemberWithdrawSuccess(_address, amount);
     }
     
     //Public Functions
 
-    function getLockedAmount(address _address) public view returns(uint256) {
+    function getLockedAmount(address _address) public returns(uint256) {
         updateStatus(_address);
-        uint256 lockedAmount= 0;
-
-        for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
-            //if still Locked
-            if (bonusAmount[_address][i].lockStatus == StatusType.Locked) {
-                lockedAmount= lockedAmount.add(bonusAmount[_address][i].value);
-            }
-            
-            if (fixedAmount[_address][i].lockStatus == StatusType.Locked) {
-                lockedAmount= lockedAmount.add(fixedAmount[_address][i].value);
-            }
-        }
-
-        return lockedAmount;
+        return lockedAmount[_address];
     }
     
-    function getUnlockedAmount(address _address) public view returns(uint256) {
+    function getUnlockedAmount(address _address) public returns(uint256) {
         updateStatus(_address);
-        uint256 unlockedAmount= 0;
-
-        for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
-            //if Unlocked
-            if (bonusAmount[_address][i].lockStatus == StatusType.Unlocked) {
-                unlockedAmount= unlockedAmount.add(bonusAmount[_address][i].value);
-            }
-            
-            if (fixedAmount[_address][i].lockStatus == StatusType.Unlocked) {
-                unlockedAmount= unlockedAmount.add(fixedAmount[_address][i].value);
-            }
-        }
-
-        return unlockedAmount;
+        return unlockedAmount[_address];
     }
     
     function getWithdrawnAmount(address _address) public view returns(uint256) {
-        updateStatus(_address);
-        uint256 withdrawnAmount= 0;
-
-        for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
-            //if Withdrawn
-            if (bonusAmount[_address][i].lockStatus == StatusType.Withdrawn) {
-                withdrawnAmount= withdrawnAmount.add(bonusAmount[_address][i].value);
-            }
-            
-            if (fixedAmount[_address][i].lockStatus == StatusType.Withdrawn) {
-                withdrawnAmount= withdrawnAmount.add(fixedAmount[_address][i].value);
-            }
-        }
-        
-        return withdrawnAmount;
+        return withdrawnAmount[_address];
     }
     
     function getFixedHistory(address _address) public view returns(uint256[], uint256[], uint256[], StatusType[]){
