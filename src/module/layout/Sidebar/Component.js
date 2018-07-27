@@ -95,23 +95,22 @@ loadData() {
                 />
 
                 <Menu onClick={this.clickItem.bind(this)} theme="dark" mode="inline" className="menu-sidebar" defaultSelectedKeys={this.detectUrl()}>
-                    <Menu.Item key="dashboard">
-                        <Icon type="dashboard" /> {I18N.get('0003')}
-                    </Menu.Item>
-                    <Menu.Item key="deposit">
-                        <Icon type="wallet" /> {I18N.get('0013')}
-                    </Menu.Item>
-                    <Menu.Item key="list-package">
-                        <Icon type="database" /> {I18N.get('0011')}
+                    <Menu.Item key="history">
+                        <Icon type="wallet" /> {I18N.get('0004')}
                     </Menu.Item>
                     { isAdmin &&
-                        <Menu.Item key="smart-staking">
-                            <Icon type="wallet" /> {I18N.get('0007')}
+                        <Menu.Item key="send">
+                            <Icon type="wallet" /> {I18N.get('0003')}
                         </Menu.Item>
                     }
                     { isAdmin &&
-                        <Menu.Item key="setting-packages">
-                            <Icon type="setting" /> {I18N.get('0012')}
+                        <Menu.Item key="return">
+                            <Icon type="wallet" /> {I18N.get('0005')}
+                        </Menu.Item>
+                    }
+                    { !isAdmin &&
+                        <Menu.Item key="claim">
+                            <Icon type="wallet" /> {I18N.get('0006')}
                         </Menu.Item>
                     }
                 </Menu>

@@ -39,9 +39,9 @@ class C extends BaseComponent {
     }
 
     ord_render() {
-        const packageId = this.props.match.params.contractAdress;
-        console.log('packageId', packageId);
-        const {getFieldDecorator} = this.props.form
+        //const packageId = this.props.match.params.contractAdress;
+        //console.log('packageId', packageId);
+        //const {getFieldDecorator} = this.props.form
         const p = this.getInputProps()
         return (
             <Col span={24} className="c_loginForm">

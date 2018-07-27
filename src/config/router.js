@@ -1,10 +1,8 @@
 import HomePage from '@/module/page/home/Container'
-import DashboardPage from '@/module/page/dashboard/Container'
-import SmartStakingPage from '@/module/page/smart-staking/Container'
-import ListPackagePage from '@/module/page/list-package/Container'
-import DetailPackagePage from '@/module/page/detail-package/Container'
-import SettingPackagePage from '@/module/page/setting-package/Container'
-import DepositPage from '@/module/page/deposit/Container'
+import AdminSendPage from '@/module/page/send/Container'
+import HistoryPage from '@/module/page/history/Container'
+import ReturnPage from '@/module/page/return/Container'
+import ClaimPage from '@/module/page/claim/Container'
 import LoginPage from '@/module/page/login/Container'
 import TermsConditionsPage from '@/module/page/terms/Container'
 
@@ -20,28 +18,20 @@ export default [
         page: HomePage
     },
     {
-        path: '/dashboard',
-        page: DashboardPage
+        path: '/send',
+        page: AdminSendPage
     },
     {
-        path: '/smart-staking',
-        page: SmartStakingPage
+        path: '/history',
+        page: HistoryPage
     },
     {
-        path: '/deposit',
-        page: DepositPage
+        path: '/return',
+        page: ReturnPage
     },
     {
-        path: '/list-package',
-        page: ListPackagePage
-    },
-    {
-        path: '/setting-packages',
-        page: SettingPackagePage
-    },
-    {
-        path: '/list-package/:id',
-        page: DetailPackagePage
+        path: '/claim',
+        page: ClaimPage
     },
     {
         path: '/login/:contractAdress',

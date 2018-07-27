@@ -11,8 +11,8 @@ export default class extends BaseService {
 
         let web3 = new Web3(new Web3.providers.HttpProvider(WEB3.HTTP))
 
-        const SmartTaking = web3.eth.contract(WEB3.ABI)
-        const contract = SmartTaking.at(WEB3.ADDRESS_CONTRACT)
+        const NextyBonus = web3.eth.contract(WEB3.ABI)
+        const contract = NextyBonus.at(WEB3.ADDRESS_CONTRACT)
         const wallet = new WalletService(privatekey)
         const walletAddress = wallet.getAddressString()
 
@@ -23,7 +23,9 @@ export default class extends BaseService {
         web3.eth.defaultAccount = walletAddress
         wallet.balance = web3.eth.getBalance(walletAddress)
 
-        const owner = contract.owner
+        const owner = contract.owner()
+        //console.log("owner=" + owner)
+        //console.log("address=" + walletAddress)
 
         if (walletAddress === owner) {
             await this.dispatch(userRedux.actions.is_admin_update(true))

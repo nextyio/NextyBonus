@@ -67,5 +67,11 @@ export default createContainer(Component, (state) => {
         getMemberList() {
             return contractService.member()
         },
+        getTotalAmount() {
+            return contractService.getTotalAmount()
+        },
+        isOwner() {
+            return contractService.isOwner()
+        },
     }
 })

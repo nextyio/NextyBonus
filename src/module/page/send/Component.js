@@ -21,7 +21,16 @@ export default class extends LoggedInPage {
     }
 
     loadData() {
-        this.props.deposit(10)
+        //this.props.deposit(1)
+
+        this.props.isOwner().then((_isOwner) => {
+            console.log("isOwner ?  " + _isOwner)
+        })
+
+        this.props.getTotalAmount().then((_totalAmount) => {
+            console.log("Total Amount " + _totalAmount)
+        })
+
         this.props.getFixedPercent().then((_percent) => {
             console.log("Percent " + _percent)
         })
