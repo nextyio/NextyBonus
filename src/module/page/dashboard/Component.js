@@ -21,15 +21,13 @@ export default class extends LoggedInPage {
     }
 
     loadData() {
-
-        this.props.setFixedPercent(10);
-
-        this.props.getMemberList().then((member) => {
-            console.log("Members" + member)
+        this.props.deposit(10)
+        this.props.getFixedPercent().then((_percent) => {
+            console.log("Percent " + _percent)
         })
 
-        this.props.getBalance().then((balance) => {
-            console.log("balance" + balance)
+        this.props.getBalance().then((_balance) => {
+            console.log("balance" + _balance)
         })
     }
 
