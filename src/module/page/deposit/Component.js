@@ -6,8 +6,9 @@ import { Link } from 'react-router-dom'
 
 import './style.scss'
 
-import { Col, Row, Icon, Form, Input, Button, Dropdown, Breadcrumb } from 'antd'
-const FormItem = Form.Item;
+import { Col, Row, Icon, Form, Notification, Button, Breadcrumb, InputNumber, Modal } from 'antd'
+
+const EPSILON= 1e-10;
 
 function isMobileDevice() {
     return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobi l e') !== -1);
@@ -22,12 +23,18 @@ export default class extends LoggedInPage {
 
     loadData() {
         //this.props.deposit(1)
+        this.setState({
+            amount: 0
+        })
 
         this.props.isOwner().then((_isOwner) => {
             console.log("isOwner ?  " + _isOwner)
         })
 
         this.props.getTotalAmount().then((_totalAmount) => {
+            this.setState({
+                totalAmount: _totalAmount * 1e-18
+            })
             console.log("Total Amount " + _totalAmount)
         })
 
@@ -36,6 +43,9 @@ export default class extends LoggedInPage {
         })
 
         this.props.getBalance().then((_balance) => {
+            this.setState({
+                balance: _balance
+            })
             console.log("balance" + _balance)
         })
     }
@@ -46,11 +56,44 @@ export default class extends LoggedInPage {
             return null;
         }
 
-        const balance = parseFloat(web3.fromWei(wallet.balance, 'ether'))
-        const address = wallet.getAddressString()
-
         return (
-            <div> test </div>
+            <div>
+                <Col xs={1} sm={1} md={6} lg={6} xl={6}>
+                </Col>
+
+                <Col xs={22} sm={22} md={12} lg={12} xl={12}>
+                    <Row>
+                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                            Your balance
+                        </Col>
+                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                            {this.numberDisplay(this.state.balance)} NTY
+                        </Col>
+                    </Row>
+
+                    <Row>
+                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                            Total amount
+                        </Col>
+                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                            {this.numberDisplay(this.state.totalAmount)} NTY
+                        </Col>
+                    </Row>
+
+                    <Col xs={24} sm={24} md={24} lg={12} xl={12}>
+                        <InputNumber 
+                            className= "defaultWidth"
+                            defaultValue= {0}
+                            value= {this.state.amount}
+                            onChange= {this.onAmountChange.bind(this)}
+                        />
+                    </Col>
+                    <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                        <Button type= "primary" onClick= {this.confirm.bind(this)} className= "defaultWidth" >Deposit</Button>
+                    </Col>
+                    
+                </Col>
+            </div>
         )
     }
 
@@ -61,5 +104,87 @@ export default class extends LoggedInPage {
                 <Breadcrumb.Item> Deposit</Breadcrumb.Item>
             </Breadcrumb>
         );
+    }
+
+    validValue(value) {
+        var deciPart = (value + ".").split(".")[1];
+      //   console.log(deciPart)
+        if (deciPart.length>2) {return value.toFixed(2)} else {return value};
+    }
+
+    onAmountChange(value) {
+        if (this.state.balance + EPSILON <= value) {
+          this.setState({
+              notEnoughNTY: "Your balance is not enough",
+          })
+        } else
+        this.setState({
+            notEnoughNTY: null
+        })
+
+        this.setState({
+            amount: this.validValue(value),
+            txhash: null,
+        })
+    }
+
+    confirm() {
+        const content = (
+            <div>
+                <div>
+                    Amount: {this.state.amount} NTY
+                </div>
+            </div>
+        );
+        Modal.confirm({
+            title: 'Are you sure?',
+            content: content,
+            okText: 'Yes',
+            okType: 'danger',
+            cancelText: 'No',
+            onOk: () => {
+                this.onConfirm()
+            },
+            onCancel() {
+            }
+        })
+    }
+
+    onConfirm() {
+        this.setState({
+            isLoading: true
+        });
+
+        const self= this;
+        this.props.deposit(this.state.amount).then((result) => {
+            if (!result) {
+                Message.error('Cannot send transaction!')
+            }
+            self.loadData();
+            Notification.success({
+                message: 'Deposit successfully!',
+            });
+
+            var event= self.props.getEventOwnerDeposit()
+            event.watch(function (err, response) {
+                console.log("deposit success")
+                if(response.event == 'OwnerDepositSuccess') {
+                    self.setState({
+                        tx_success: true,
+                        isLoading: false
+                    });
+                    self.loadData();
+                    Notification.success({
+                        message: 'Deposit successfully!',
+                    });
+                    event.stopWatching()
+                }
+            });
+        })
+        //setTimeout(this.loadData.bind(this), 6000);
+    }
+
+    numberDisplay(value) {
+        return Number(value).toFixed(2)
     }
 }

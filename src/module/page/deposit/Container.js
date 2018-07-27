@@ -21,8 +21,8 @@ export default createContainer(Component, (state) => {
         },
 
         //Owners Functions
-        deposit(_amount) {
-            return contractService.deposit(_amount)
+        async deposit(_amount) {
+            return await contractService.deposit(_amount)
         },
         addMember(_address) {
             return contractService.addMember(_address)
@@ -67,11 +67,14 @@ export default createContainer(Component, (state) => {
         getMemberList() {
             return contractService.member()
         },
-        getTotalAmount() {
-            return contractService.getTotalAmount()
+        async getTotalAmount() {
+            return await contractService.getTotalAmount()
         },
         isOwner() {
             return contractService.isOwner()
+        },
+        getEventOwnerDeposit() {
+            return contractService.getEventOwnerDeposit()
         },
     }
 })
