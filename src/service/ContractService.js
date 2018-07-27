@@ -193,4 +193,22 @@ export default class extends BaseService {
         return contract.FIXED_PERCENT()
     }
 
+    async getTotalAmount() {
+        const storeUser = this.store.getState().user
+        let {contract} = storeUser.profile
+        if (!contract) {
+            return
+        }
+        return contract.totalAmount()
+    }
+
+    async isOwner() {
+        const storeUser = this.store.getState().user
+        let {contract} = storeUser.profile
+        if (!contract) {
+            return
+        }
+        return contract.isOwner()
+    }
+
 }
