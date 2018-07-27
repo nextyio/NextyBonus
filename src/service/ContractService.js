@@ -199,7 +199,7 @@ export default class extends BaseService {
         if (!contract) {
             return
         }
-        return contract.totalAmount()
+        return contract.totalAmount().toString()
     }
 
     async isOwner() {
@@ -209,6 +209,22 @@ export default class extends BaseService {
             return
         }
         return contract.isOwner()
+    }
+
+    //Events
+
+    getEventOwnerDeposit() {
+        console.log("ok")
+        const storeUser = this.store.getState().user
+        let {contract, web3, wallet} = storeUser.profile
+        return contract.OwnerDepositSuccess()
+    }
+
+    getEventOwnerWithdraw() {
+        console.log("ok")
+        const storeUser = this.store.getState().user
+        let {contract, web3, wallet} = storeUser.profile
+        return contract.OwnerWithdrawSuccess()
     }
 
 }
