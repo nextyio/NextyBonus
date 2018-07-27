@@ -1,12 +1,12 @@
 export default {
     // Header
     '0001': 'Bounty Programs',
-    '0002': 'Home',
+    '0002': 'Deposit',
     '0003': 'Send',
     '0004': 'History',
     '0005': 'Return',
     '0006': 'Claim',
-    '0007': 'User History',
+    '0007': 'Withdraw',
     '0008': 'About',
     '0009': 'FAQ',
     '0010': 'Interest Management',

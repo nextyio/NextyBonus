@@ -108,6 +108,16 @@ loadData() {
                             <Icon type="wallet" /> {I18N.get('0005')}
                         </Menu.Item>
                     }
+                    { isAdmin &&
+                        <Menu.Item key="deposit">
+                            <Icon type="wallet" /> {I18N.get('0002')}
+                        </Menu.Item>
+                    }
+                    { isAdmin &&
+                        <Menu.Item key="withdraw">
+                            <Icon type="wallet" /> {I18N.get('0007')}
+                        </Menu.Item>
+                    }
                     { !isAdmin &&
                         <Menu.Item key="claim">
                             <Icon type="wallet" /> {I18N.get('0006')}
@@ -123,17 +133,12 @@ loadData() {
     clickItem(e) {
         const key = e.key
         if (_.includes([
-            'home',
-            'smart-staking',
-            'register',
-            'signup',
-            'dashboard',
-            'about',
-            'contact',
-            'profile',
-            'setting-packages',
-            'list-package',
-            'deposit'
+            'history',
+            'send',
+            'return',
+            'deposit',
+            'withdraw',
+            'claim',
         ], key)) {
             this.props.history.push('/' + e.key)
         }
@@ -157,15 +162,16 @@ loadData() {
         let url = window.location.pathname;
 
         let sidebar = [
-            'smart-staking',
-            'dashboard',
-            'setting-packages',
-            'list-package',
-            'deposit'
+            'history',
+            'send',
+            'return',
+            'deposit',
+            'withdraw',
+            'claim'
         ];
 
         if (!url) {
-            return ['dashboard']
+            return ['history']
         }
 
         for(var menu in sidebar) {

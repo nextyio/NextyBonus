@@ -1,4 +1,5 @@
-import HomePage from '@/module/page/home/Container'
+import DepositPage from '@/module/page/deposit/Container'
+import WithdrawPage from '@/module/page/withdraw/Container'
 import AdminSendPage from '@/module/page/send/Container'
 import HistoryPage from '@/module/page/history/Container'
 import ReturnPage from '@/module/page/return/Container'
@@ -11,11 +12,15 @@ import NotFound from '@/module/page/error/NotFound'
 export default [
     {
         path: '/',
-        page: HomePage
+        page: LoginPage
     },
     {
-        path: '/home',
-        page: HomePage
+        path: '/deposit',
+        page: DepositPage
+    },
+    {
+        path: '/withdraw',
+        page: WithdrawPage
     },
     {
         path: '/send',
@@ -34,7 +39,7 @@ export default [
         page: ClaimPage
     },
     {
-        path: '/login/:contractAdress',
+        path: '/login',
         page: LoginPage
     },
     {
