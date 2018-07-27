@@ -58,6 +58,7 @@ contract NextyBonus {
     event CreatedSuccess(address _address, uint256 _amount);
     event RemovedSuccess(uint256 _amount);
     event OwnerWithdrawSuccess(uint256 _amount);
+    event OwnerDepositSuccess(uint256 _amount);
 
     //Members Events
     
@@ -75,6 +76,14 @@ contract NextyBonus {
         require(!reEntrancyMutex);
         reEntrancyMutex = true; 
         totalAmount= totalAmount.add(msg.value);
+        reEntrancyMutex = false; 
+    }
+
+    function deposit() public payable {
+        require(!reEntrancyMutex);
+        reEntrancyMutex = true; 
+        totalAmount= totalAmount.add(msg.value);
+        emit OwnerDepositSuccess(msg.value);
         reEntrancyMutex = false; 
     }
     
