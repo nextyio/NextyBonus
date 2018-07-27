@@ -271,5 +271,9 @@ contract NextyBonus {
         
         return (time, endTime, value, lockStatus);
     }
+
+    function isOwner() public view returns(bool) {
+        return (msg.sender == owner);
+    }
     
 }
