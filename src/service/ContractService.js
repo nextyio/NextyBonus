@@ -96,7 +96,7 @@ export default class extends BaseService {
         if (!contract) {
             return
         }
-        return contract.ownerWithdraw(amount)
+        return contract.ownerWithdraw(amount*1e18)
     }
 
     async setFixedPercent(percent) {
