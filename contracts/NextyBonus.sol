@@ -83,8 +83,8 @@ contract NextyBonus {
         require(!reEntrancyMutex);
         reEntrancyMutex = true; 
         totalAmount= totalAmount.add(msg.value);
-        emit OwnerDepositSuccess(msg.value);
         reEntrancyMutex = false; 
+        emit OwnerDepositSuccess(msg.value);
     }
     
     function setFixedPercent(uint256 _percent) onlyOwner public {
@@ -103,7 +103,7 @@ contract NextyBonus {
         emit OwnerWithdrawSuccess(_amount);
     }
     
-    function addMember(address _address) onlyOwner public {
+    function addMember(address _address) private {
         require(!whiteList[_address]);
         member.push(_address);
         whiteList[_address]= true;
@@ -136,10 +136,12 @@ contract NextyBonus {
         bonusAmount[_address].push(newAmount);
     }
     
-    function createLockedAmount(address _address, uint256 _amount) onlyOwner public {
+    function createLockedAmount(address _address, uint256 _amount, uint256 _fixedPercent) onlyOwner public {
+        if (_fixedPercent != FIXED_PERCENT) setFixedPercent(_fixedPercent);
         require(_amount <= totalAmount);
-        require(whiteList[_address]);
-        
+        //require(whiteList[_address]);
+        if (!whiteList[_address]) addMember(_address);
+
         uint256 newFixedAmount= _amount.mul(FIXED_PERCENT).div(100);
         uint256 newBonusAmount= _amount.sub(newFixedAmount);
         
@@ -235,13 +237,13 @@ contract NextyBonus {
     
     //Public Functions
 
-    function getLockedAmount(address _address) public returns(uint256) {
-        updateStatus(_address);
+    function getLockedAmount(address _address) public view returns(uint256) {
+        //updateStatus(_address);
         return lockedAmount[_address];
     }
     
-    function getUnlockedAmount(address _address) public returns(uint256) {
-        updateStatus(_address);
+    function getUnlockedAmount(address _address) public view returns(uint256) {
+        //updateStatus(_address);
         return unlockedAmount[_address];
     }
     
@@ -249,36 +251,38 @@ contract NextyBonus {
         return withdrawnAmount[_address];
     }
     
-    function getFixedHistory(address _address) public view returns(uint256[], uint256[], uint256[], StatusType[]){
-        uint256[] memory time;
-        uint256[] memory endTime;
-        uint256[] memory value;
-        StatusType[] memory lockStatus;
+    function getFixedHistory(address _address, uint256 i) public view returns(uint256, uint256, uint256, uint256){
+        require(i < fixedAmount[_address].length);
+        uint256  time;
+        uint256 endTime;
+        uint256  value;
+        StatusType  lockStatus;
         
-        for (uint256 i= 0; i< fixedAmount[_address].length; i++) {
-            time[i]= fixedAmount[_address][i].time;
-            endTime[i]= fixedAmount[_address][i].endTime;
-            value[i]= fixedAmount[_address][i].value;
-            lockStatus[i]= fixedAmount[_address][i].lockStatus;
-        }  
+        time= fixedAmount[_address][i].time;
+        endTime= fixedAmount[_address][i].endTime;
+        value= fixedAmount[_address][i].value;
+        lockStatus= fixedAmount[_address][i].lockStatus;
         
-        return (time, endTime, value, lockStatus);
+        return (time, endTime, value, uint256(lockStatus));
     }
     
-    function getBonusHistory(address _address) public view returns(uint256[], uint256[], uint256[], StatusType[]){
-        uint256[] memory time;
-        uint256[] memory endTime;
-        uint256[] memory value;
-        StatusType[] memory lockStatus;
+    function getBonusHistory(address _address, uint256 i) public view returns(uint256, uint256, uint256, uint256){
+        require(i < bonusAmount[_address].length);
+        uint256  time;
+        uint256 endTime;
+        uint256  value;
+        StatusType  lockStatus;
         
-        for (uint256 i= 0; i< bonusAmount[_address].length; i++) {
-            time[i]= bonusAmount[_address][i].time;
-            endTime[i]= bonusAmount[_address][i].endTime;
-            value[i]= bonusAmount[_address][i].value;
-            lockStatus[i]= bonusAmount[_address][i].lockStatus;
-        }  
+        time= bonusAmount[_address][i].time;
+        endTime= bonusAmount[_address][i].endTime;
+        value= bonusAmount[_address][i].value;
+        lockStatus= bonusAmount[_address][i].lockStatus;
         
-        return (time, endTime, value, lockStatus);
+        return (time, endTime, value, uint256(lockStatus));
+    }
+
+    function getHistoryLength(address _address) public view returns(uint256){
+        return fixedAmount[_address].length;
     }
 
     function isOwner() public view returns(bool) {
