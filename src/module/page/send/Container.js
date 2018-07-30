@@ -8,8 +8,8 @@ export default createContainer(Component, (state) => {
         ...state.user
     }
 }, () => {
-    const contractService = new ContractService()
-    const userService = new UserService()
+    const contractService= new ContractService()
+    const userService= new UserService()
 
     return {
         //Basic Functions
@@ -21,8 +21,8 @@ export default createContainer(Component, (state) => {
         },
 
         //Owners Functions
-        deposit(_amount) {
-            return contractService.deposit(_amount)
+        async ownerWithdraw(_amount) {
+            return await contractService.ownerWithdraw(_amount)
         },
         addMember(_address) {
             return contractService.addMember(_address)
@@ -67,11 +67,12 @@ export default createContainer(Component, (state) => {
         getMemberList() {
             return contractService.member()
         },
-        getTotalAmount() {
-            return contractService.getTotalAmount()
+        async getTotalAmount() {
+            return await contractService.getTotalAmount()
         },
         isOwner() {
             return contractService.isOwner()
         },
+        
     }
 })

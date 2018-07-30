@@ -107,19 +107,24 @@ export default class extends LoggedInPage {
     }
 
     validValue(value) {
-        var deciPart = (value + ".").split(".")[1];
+        var deciPart= (value + ".").split(".")[1];
       //   console.log(deciPart)
-        if (deciPart.length>2) {return value.toFixed(2)} else {return value};
+        if (deciPart.length > 2) {return value.toFixed(2)} else {return value};
     }
 
     onAmountChange(value) {
-        if (this.state.balance + EPSILON <= value) {
+        if (isNaN(value)) {
+            this.setState({
+                error: "invalid input",
+            })
+        } else 
+        if (this.state.balance + EPSILON < value ) {
           this.setState({
-              notEnoughNTY: "Your balance is not enough",
+              error: "Your balance is not enough",
           })
         } else
         this.setState({
-            notEnoughNTY: null
+            error: null
         })
 
         this.setState({
@@ -129,6 +134,13 @@ export default class extends LoggedInPage {
     }
 
     confirm() {
+        if (this.state.error) {
+            Notification.error({
+                message: this.state.error,
+            });
+            return false;
+        }
+
         const content = (
             <div>
                 <div>
@@ -160,12 +172,9 @@ export default class extends LoggedInPage {
             if (!result) {
                 Message.error('Cannot send transaction!')
             }
-            self.loadData();
-            Notification.success({
-                message: 'Deposit successfully!',
-            });
 
             var event= self.props.getEventOwnerDeposit()
+            console.log("start listening")
             event.watch(function (err, response) {
                 console.log("deposit success")
                 if(response.event == 'OwnerDepositSuccess') {

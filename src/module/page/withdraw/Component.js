@@ -14,6 +14,7 @@ function isMobileDevice() {
 };
 
 const isMobile= isMobileDevice();
+const EPSILON= 1e-10
 
 export default class extends LoggedInPage {
     componentDidMount() {
@@ -112,13 +113,18 @@ export default class extends LoggedInPage {
     }
 
     onAmountChange(value) {
+        if (isNaN(value)) {
+            this.setState({
+                error: "invalid input",
+            })
+        } else 
         if (this.state.totalAmount + EPSILON < value ) {
           this.setState({
-              notEnoughNTY: "Your balance is not enough",
+              error: "Pool is not enough to withdraw",
           })
         } else
         this.setState({
-            notEnoughNTY: null
+            error: null
         })
 
         this.setState({
@@ -128,6 +134,14 @@ export default class extends LoggedInPage {
     }
 
     confirm() {
+
+        if (this.state.error) {
+            Notification.error({
+                message: this.state.error,
+            });
+            return false;
+        }
+
         const content = (
             <div>
                 <div>
@@ -159,11 +173,7 @@ export default class extends LoggedInPage {
             if (!result) {
                 Message.error('Cannot send transaction!')
             }
-            self.loadData();
-            Notification.success({
-                message: 'Withdraw successfully!',
-            });
-
+            
             var event= self.props.getEventOwnerWithdraw()
             event.watch(function (err, response) {
                 console.log("withdraw success")
