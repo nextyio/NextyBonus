@@ -16,6 +16,9 @@ export default createContainer(Component, (state) => {
         async getBalance() {
             return await userService.getBalance()
         },
+        async getWallet() {
+            return await userService.getWallet()
+        },
         async callFunction(functionName, params) {
             return await contractService.callFunction(functionName, params)
         },
@@ -58,8 +61,11 @@ export default createContainer(Component, (state) => {
         getFixedHistory(_address) {
             return contractService.getFixedHistory(_address)
         },
-        getBonusHistory(_address) {
-            return contractService.getBonusHistory(_address)
+        getBonusHistory(_address, i) {
+            return contractService.getBonusHistory(_address, i)
+        },
+        getHistoryLength(_address) {
+            return contractService.getHistoryLength(_address)
         },
         getFixedPercent() {
             return contractService.getFixedPercent()

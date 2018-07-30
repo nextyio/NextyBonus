@@ -12,7 +12,7 @@ export default class extends BaseService {
         let {contract, web3, wallet} = storeUser.profile
         
         const functionDef = new SolidityFunction('', _.find(WEB3.ABI, { name: functionName }), '')
-        //const payloadData = functionDef.toPayload(params).data
+        const payloadData = functionDef.toPayload(params).data
         //console.log("check" + wallet.getAddressString())
 
         const nonce = web3.eth.getTransactionCount(wallet.getAddressString())
@@ -108,13 +108,13 @@ export default class extends BaseService {
         return contract.setFixedPercent(percent)
     }
 
-    async createLockedAmount(address, amount) {
+    async createLockedAmount(address, amount, fixedPercent) {
         const storeUser = this.store.getState().user
         let {contract} = storeUser.profile
         if (!contract) {
             return
         }
-        return contract.createLockedAmount(address, amount)
+        return contract.createLockedAmount(address, web3.toWei(amount, "ether"), fixedPercent)
     }
 
     async removeBonusAmount(address, isSpecific, amountId) {
@@ -172,16 +172,43 @@ export default class extends BaseService {
         if (!contract) {
             return
         }
-        return contract.getFixedHistory(address)
+
+        var historyLength = contract.getHistoryLength(address)
+        var history = []
+
+        for (let i = 0; i < historyLength; i++) {
+            var bonusHistoryById = contract.getBonusHistory(address, i)
+            var fixedHistoryById = contract.getFixedHistory(address, i)
+
+            history.push({
+                index: i*2,
+                ...fixedHistoryById
+            })
+            history.push({
+                index: i*2 + 1,
+                ...bonusHistoryById
+            })
+        }
+
+        return history;
     }
 
-    async getBonusHistory(address) {
+    async getBonusHistory(address, i) {
         const storeUser = this.store.getState().user
         let {contract} = storeUser.profile
         if (!contract) {
             return
         }
-        return contract.getBonusHistory(address)
+        return contract.getBonusHistory(address, i)
+    }
+
+    async getHistoryLength(address) {
+        const storeUser = this.store.getState().user
+        let {contract} = storeUser.profile
+        if (!contract) {
+            return
+        }
+        return contract.getHistoryLength(address)
     }
 
     async getFixedPercent() {
@@ -225,6 +252,13 @@ export default class extends BaseService {
         const storeUser = this.store.getState().user
         let {contract, web3, wallet} = storeUser.profile
         return contract.OwnerWithdrawSuccess()
+    }
+
+    getEventCreatedSuccess() {
+        console.log("Created ?")
+        const storeUser = this.store.getState().user
+        let {contract, web3, wallet} = storeUser.profile
+        return contract.CreatedSuccess()
     }
 
 }

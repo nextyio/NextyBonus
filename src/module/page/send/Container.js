@@ -33,8 +33,8 @@ export default createContainer(Component, (state) => {
         ownerWithdraw(_amount) {
             return contractService.ownerWithdraw(_amount)
         },
-        createLockedAmount(_address, _amount) {
-            return contractService.createLockedAmount(_address, _amount)
+        async createLockedAmount(address, amount, fixedPercent) {
+            return await contractService.createLockedAmount(address, amount, fixedPercent)
         },
         removeBonusAmount(_address, _isSpecific, _amountId) {
             return contractService.removeBonusAmount(_address, _isSpecific, _amountId)
@@ -72,6 +72,9 @@ export default createContainer(Component, (state) => {
         },
         isOwner() {
             return contractService.isOwner()
+        },
+        getEventCreatedSuccess() {
+            return contractService.getEventCreatedSuccess()
         },
         
     }

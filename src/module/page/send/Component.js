@@ -31,7 +31,10 @@ export default class extends LoggedInPage {
     loadData() {
         //this.props.deposit(1)
         this.setState({
-            amount: 0
+            addressError: "invalid walletAddress",
+            amountError: "invalid input",
+            amount: 0,
+            toWallet: '',
         })
 
         this.props.isOwner().then((_isOwner) => {
@@ -39,6 +42,10 @@ export default class extends LoggedInPage {
         })
 
         this.props.getFixedPercent().then((_percent) => {
+            this.setState({
+                currentPercent: _percent,
+                setPercent: _percent
+            })
             console.log("Percent " + _percent)
         })
 
@@ -79,6 +86,7 @@ export default class extends LoggedInPage {
                             <Input
                                 className= "defaultWidth"
                                 defaultValue= {''}
+                                value= {this.state.toWallet}
                                 onChange= {this.onToWalletChange.bind(this)}
                             />
                         </Col>
@@ -94,6 +102,22 @@ export default class extends LoggedInPage {
                                 defaultValue= {0}
                                 value= {this.state.amount}
                                 onChange= {this.onAmountChange.bind(this)}
+                            />
+                        </Col>
+                    </Row>
+
+                    <Row className= "defaultPadding">
+                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                            Fixed percent:
+                        </Col>
+                        <Col xs={24} sm={24} md={24} lg={12} xl={12}>
+                            <InputNumber 
+                                className= "defaultWidth"
+                                min={0}
+                                max={100}
+                                defaultValue= {Number(this.state.currentPercent)}
+                                value= {this.state.setPercent}
+                                onChange= {this.onPercentChange.bind(this)}
                             />
                         </Col>
                     </Row>
@@ -150,7 +174,6 @@ export default class extends LoggedInPage {
     };
 
     onToWalletChange(e) {
-
         console.log(this.isWalletAddress(e.target.value))
         if (!this.isWalletAddress(e.target.value)) {
             this.setState({
@@ -164,6 +187,23 @@ export default class extends LoggedInPage {
 
         this.setState({
             toWallet: e.target.value,
+            txhash: null,
+        })
+    }
+
+    onPercentChange(value) {
+        console.log(value);
+        if ((value != parseInt(value)) || (value < 0) || (value >100)) {
+            this.setState({
+                percentError: "invalid input",
+            })
+        } else
+        this.setState({
+            percentError: null
+        })
+
+        this.setState({
+            setPercent: value,
             txhash: null,
         })
     }
@@ -190,6 +230,12 @@ export default class extends LoggedInPage {
     }
 
     confirm() {
+        if (this.state.percentError) {
+            Notification.error({
+                message: this.state.percentError,
+            });
+            return false;
+        }
         if (this.state.addressError) {
             Notification.error({
                 message: this.state.addressError,
@@ -231,26 +277,24 @@ export default class extends LoggedInPage {
         });
 
         const self= this;
-        this.props.ownerWithdraw(Number(this.state.amount) - EPSILON).then((result) => {
+        console.log(this.state.toWallet + " " +this.state.amount + " " + this.state.setPercent)
+        //this.props.createLockedAmount(this.state.toWallet, this.state.amount, this.state.setPercent).then((result) => {
+        this.props.callFunction('createLockedAmount', [this.state.toWallet, this.state.amount*1e18, this.state.setPercent]).then((result) => {
+            console.log("called Create func")
             if (!result) {
                 Message.error('Cannot send transaction!')
             }
-            self.loadData();
-            Notification.success({
-                message: 'Withdraw successfully!',
-            });
 
-            var event= self.props.getEventOwnerWithdraw()
+            var event= self.props.getEventCreatedSuccess()
             event.watch(function (err, response) {
-                console.log("withdraw success")
-                if(response.event == 'OwnerWithdrawSuccess') {
+                if(response.event == 'CreatedSuccess') {
                     self.setState({
                         tx_success: true,
                         isLoading: false
                     });
                     self.loadData();
                     Notification.success({
-                        message: 'Withdraw successfully!',
+                        message: 'Sent successfully!',
                     });
                     event.stopWatching()
                 }
