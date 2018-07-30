@@ -54,7 +54,7 @@ export default class extends BaseComponent {
         let url = window.location.pathname;
         const contract = sessionStorage.getItem('contract-adress')
         if (!isLogin && url !== '/user-guide') {
-            return this.props.history.replace(`/login/${contract}`);
+            return this.props.history.replace(`/login/`);
         }
     }
 }
