@@ -6,14 +6,22 @@ import { Link } from 'react-router-dom'
 
 import './style.scss'
 
-import { Col, Row, Icon, Form, Notification, Button, Breadcrumb, InputNumber, Modal } from 'antd'
+import { Col, Row, Icon, Form, Notification, Button, Breadcrumb, InputNumber, Input, Modal } from 'antd'
 const FormItem= Form.Item;
+
+let SHA3 = require('crypto-js/sha3');
+let sha3 = (value) => {
+    return SHA3(value, {
+        outputLength: 256
+    }).toString();
+    }
 
 function isMobileDevice() {
     return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobi l e') !== -1);
 };
 
 const isMobile= isMobileDevice();
+const EPSILON= 1e-10
 
 export default class extends LoggedInPage {
     componentDidMount() {
@@ -30,22 +38,15 @@ export default class extends LoggedInPage {
             console.log("isOwner ?  " + _isOwner)
         })
 
+        this.props.getFixedPercent().then((_percent) => {
+            console.log("Percent " + _percent)
+        })
+
         this.props.getTotalAmount().then((_totalAmount) => {
             this.setState({
                 totalAmount: _totalAmount * 1e-18
             })
             console.log("Total Amount " + _totalAmount)
-        })
-
-        this.props.getFixedPercent().then((_percent) => {
-            console.log("Percent " + _percent)
-        })
-
-        this.props.getBalance().then((_balance) => {
-            this.setState({
-                balance: _balance
-            })
-            console.log("balance" + _balance)
         })
     }
 
@@ -61,34 +62,43 @@ export default class extends LoggedInPage {
                 </Col>
 
                 <Col xs={22} sm={22} md={12} lg={12} xl={12}>
-                    <Row>
+                    <Row className= "defaultPadding">
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            Your balance
-                        </Col>
-                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            {this.numberDisplay(this.state.balance)} NTY
-                        </Col>
-                    </Row>
-
-                    <Row>
-                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            Total amount
+                            Balance:
                         </Col>
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                             {this.numberDisplay(this.state.totalAmount)} NTY
                         </Col>
                     </Row>
 
-                    <Col xs={24} sm={24} md={24} lg={12} xl={12}>
-                        <InputNumber 
-                            className= "defaultWidth"
-                            defaultValue= {0}
-                            value= {this.state.amount}
-                            onChange= {this.onAmountChange.bind(this)}
-                        />
-                    </Col>
-                    <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                        <Button type= "primary" onClick= {this.confirm.bind(this)} className= "defaultWidth" >Withdraw</Button>
+                    <Row className= "defaultPadding">
+                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                            Staff's wallet address:
+                        </Col>
+                        <Col xs={24} sm={24} md={24} lg={12} xl={12}>
+                            <Input
+                                className= "defaultWidth"
+                                defaultValue= {''}
+                                onChange= {this.onToWalletChange.bind(this)}
+                            />
+                        </Col>
+                    </Row>
+
+                    <Row className= "defaultPadding">
+                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                            Amount:
+                        </Col>
+                        <Col xs={24} sm={24} md={24} lg={12} xl={12}>
+                            <InputNumber 
+                                className= "defaultWidth"
+                                defaultValue= {0}
+                                value= {this.state.amount}
+                                onChange= {this.onAmountChange.bind(this)}
+                            />
+                        </Col>
+                    </Row>
+                    <Col xs={24} sm={24} md={12} lg={24} xl={24} className= "centerDraw defaultWidth defaultPadding">
+                        <Button type= "primary" onClick= {this.confirm.bind(this)} className= "defaultWidth" >Send</Button>
                     </Col>
                     
                 </Col>
@@ -111,14 +121,66 @@ export default class extends LoggedInPage {
         if (deciPart.length > 2) {return value.toFixed(2)} else {return value};
     }
 
-    onAmountChange(value) {
-        if (this.state.totalAmount + EPSILON < value ) {
-          this.setState({
-              notEnoughNTY: "Your balance is not enough",
-          })
+    isChecksumAddress (address) {
+        // Check each case
+        address = address.replace('0x','');
+        let addressHash = sha3(address.toLowerCase());
+    
+        for (let i = 0; i < 40; i++ ) {
+            // The nth letter should be uppercase if the nth digit of casemap is 1
+            if ((parseInt(addressHash[i], 16) > 7 && address[i].toUpperCase() !== address[i]) ||
+                (parseInt(addressHash[i], 16) <= 7 && address[i].toLowerCase() !== address[i])) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    isWalletAddress(address) {
+        if (!/^(0x)?[0-9a-f]{40}$/i.test(address)) {
+            // check if it has the basic requirements of an address
+            return false;
+        } else if (/^(0x)?[0-9a-f]{40}$/.test(address) || /^(0x)?[0-9A-F]{40}$/.test(address)) {
+            // If it's all small caps or all all caps, return true
+            return true;
+        } else {
+            // Otherwise check each case
+            return this.isChecksumAddress(address);
+        }
+    };
+
+    onToWalletChange(e) {
+
+        console.log(this.isWalletAddress(e.target.value))
+        if (!this.isWalletAddress(e.target.value)) {
+            this.setState({
+                addressError: "invalid walletAddress",
+            })
         } else
         this.setState({
-            notEnoughNTY: null
+            addressError: null
+        })
+        
+
+        this.setState({
+            toWallet: e.target.value,
+            txhash: null,
+        })
+    }
+
+    onAmountChange(value) {
+        if (isNaN(value)) {
+            this.setState({
+                amountError: "invalid input",
+            })
+        } else 
+        if (this.state.totalAmount + EPSILON < value ) {
+        this.setState({
+            amountError: "Pool is not enough to send",
+        })
+        } else
+        this.setState({
+            amountError: null
         })
 
         this.setState({
@@ -128,6 +190,19 @@ export default class extends LoggedInPage {
     }
 
     confirm() {
+        if (this.state.addressError) {
+            Notification.error({
+                message: this.state.addressError,
+            });
+            return false;
+        }
+        if (this.state.amountError) {
+            Notification.error({
+                message: this.state.amountError,
+            });
+            return false;
+        }
+
         const content = (
             <div>
                 <div>
@@ -135,6 +210,7 @@ export default class extends LoggedInPage {
                 </div>
             </div>
         );
+
         Modal.confirm({
             title: 'Are you sure?',
             content: content,

@@ -62,7 +62,7 @@ export default class extends LoggedInPage {
                 </Col>
 
                 <Col xs={22} sm={22} md={12} lg={12} xl={12}>
-                    <Row>
+                    <Row className= "defaultPadding">
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                             Your balance
                         </Col>
@@ -71,7 +71,7 @@ export default class extends LoggedInPage {
                         </Col>
                     </Row>
 
-                    <Row>
+                    <Row className= "defaultPadding">
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                             Total amount
                         </Col>
@@ -79,18 +79,19 @@ export default class extends LoggedInPage {
                             {this.numberDisplay(this.state.totalAmount)} NTY
                         </Col>
                     </Row>
-
-                    <Col xs={24} sm={24} md={24} lg={12} xl={12}>
-                        <InputNumber 
-                            className= "defaultWidth"
-                            defaultValue= {0}
-                            value= {this.state.amount}
-                            onChange= {this.onAmountChange.bind(this)}
-                        />
-                    </Col>
-                    <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                        <Button type= "primary" onClick= {this.confirm.bind(this)} className= "defaultWidth" >Withdraw</Button>
-                    </Col>
+                    <Row className= "defaultPadding">
+                        <Col xs={24} sm={24} md={24} lg={12} xl={12} className= "defaultPadding">
+                            <InputNumber 
+                                className= "defaultWidth"
+                                defaultValue= {0}
+                                value= {this.state.amount}
+                                onChange= {this.onAmountChange.bind(this)}
+                            />
+                        </Col>
+                        <Col xs={24} sm={24} md={12} lg={12} xl={12} className= "defaultPadding">
+                            <Button type= "primary" onClick= {this.confirm.bind(this)} className= "defaultWidth" >Withdraw</Button>
+                        </Col>
+                    </Row>
                     
                 </Col>
             </div>
