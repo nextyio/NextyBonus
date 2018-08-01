@@ -23,8 +23,8 @@ export default class extends BaseService {
             data: payloadData
         }
         
-        //const gas = this.estimateGas(rawTx)
-        const gas = 6000000
+        const gas = this.estimateGas(rawTx)
+        //const gas = 6000000
         rawTx.gas = gas
 
         return this.sendRawTransaction(rawTx)

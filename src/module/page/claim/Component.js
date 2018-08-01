@@ -1,26 +1,10 @@
 import React from 'react';
 import LoggedInPage from '../LoggedInPage';
-import Footer from '@/module/layout/Footer/Container'
-import Tx from 'ethereumjs-tx'
-import { Link } from 'react-router-dom'
 
 import './style.scss'
 
-import { Col, Row, Icon, Form, Notification, Button, Breadcrumb, InputNumber, Input, Modal } from 'antd'
-const FormItem= Form.Item;
+import { Col, Row, Icon, Form, Notification, Button, Breadcrumb, Modal } from 'antd'
 
-let SHA3 = require('crypto-js/sha3');
-let sha3 = (value) => {
-    return SHA3(value, {
-        outputLength: 256
-    }).toString();
-    }
-
-function isMobileDevice() {
-    return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobi l e') !== -1);
-};
-
-const isMobile= isMobileDevice();
 const EPSILON= 1e-10
 
 export default class extends LoggedInPage {

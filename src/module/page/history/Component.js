@@ -1,8 +1,5 @@
 import React from 'react';
 import LoggedInPage from '../LoggedInPage';
-import Footer from '@/module/layout/Footer/Container'
-import Tx from 'ethereumjs-tx'
-import { Link } from 'react-router-dom'
 import moment from 'moment/moment'
 
 import './style.scss'
@@ -12,10 +9,10 @@ const Search = Input.Search;
 
 export default class extends LoggedInPage {
     componentDidMount() {
-        window.addEventListener('resize', this.handleWindowSizeChange);
+        window.addEventListener('resize', this.handleWindowSizeChange); 
         this.props.getWallet().then((_wallet) => {
-            this.setState({ searchWallet: _wallet });
-            this.loadData(_wallet)
+            this.setState({ searchWallet : _wallet });
+            this.loadData(_wallet) //load data base on current wallet
         })
         this.setScroll(window.innerWidth)
     }
@@ -25,29 +22,24 @@ export default class extends LoggedInPage {
     };
 
     setScroll(width){
-        var scroll=0;
-        if (width<600) scroll=375;
-        this.setState({ scroll: scroll });
+        var scroll= 0;
+        if (width < 600) scroll= 375;
+        this.setState({ scroll : scroll });
     }
 
     loadData(_wallet) {
         this.props.callFunction('updateStatus', [_wallet])
-
-        this.props.getWallet().then((_wallet) => {
-            this.setState({ searchWallet: _wallet });
-        })
 
         this.props.getFixedHistory(_wallet).then((_history) => {
             this.setState({
                 history: _history
             })
         })
-        
     }
 
     searchByAddress(address){
         this.setState({
-            searchWallet: address
+            searchWallet : address
         })
         this.props.getFixedHistory(address).then((_history) => {
             this.setState({
@@ -68,6 +60,7 @@ export default class extends LoggedInPage {
             case 3:
                 return "Removed"
         }
+        return false;
     }
 
     comfirm(index) {
@@ -76,6 +69,7 @@ export default class extends LoggedInPage {
                     This staff has been working very hard !!! 
             </div>
         );
+
         Modal.confirm({
             title: 'Are you sure?',
             content: content,
@@ -120,12 +114,27 @@ export default class extends LoggedInPage {
     }
 
     renderReturnButton(dataSource, index){
-        var removeable= dataSource[index][4];
+        var removeable= dataSource[index][4]; //get bool removeable from smart contract output
         if (removeable) 
         return (
             <div><Button type= "primary" className= "defaultWidth" >Remove</Button></div>
        )
         return (<div></div>);
+    }
+
+    renderDatetime(time, formatString) {
+        return ( 
+            <p>{moment.utc(time * 1000).format(formatString) }</p>
+        )
+    }
+
+    renderAmount(amountString, decimalNumber, convert) {
+        var mul=1
+        if (convert == 'toEther') mul= 1e-18
+        if (convert == 'toWei') mul= 1e18
+        return (
+            <p>{(parseFloat(amountString * mul).toFixed(decimalNumber))} NTY</p>
+        )
     }
 
     renderTable() {
@@ -138,7 +147,7 @@ export default class extends LoggedInPage {
                 dataIndex: 0,
                 key: 'time',
                 render: (time) => {
-                    return <p>{moment.utc(time * 1000).format('DD/MM/YYYY') }</p>
+                    return this.renderDatetime(time, 'DD/MM/YYYY')
                 }
             }, 
             {
@@ -146,7 +155,7 @@ export default class extends LoggedInPage {
                 dataIndex: 1,
                 key: 'endTime',
                 render: (endTime) => {
-                    return <p>{moment.utc(endTime * 1000).format('DD/MM/YYYY') }</p>
+                    return this.renderDatetime(endTime, 'DD/MM/YYYY')
                 }
             }, 
             {
@@ -154,7 +163,7 @@ export default class extends LoggedInPage {
                 dataIndex: 2,
                 key: 'amount',
                 render: (amount) => {
-                    return <p>{Number(parseFloat(amount / 1e18).toFixed(2)).toLocaleString()} NTY</p>
+                    return this.renderAmount(amount, 2, 'toEther')
                 }
             },
             {
@@ -166,6 +175,8 @@ export default class extends LoggedInPage {
                 }
             }
         ];
+
+        //column for admin only
         if (this.props.is_admin)
         columns.push({ 
             title: 'Return',
@@ -176,28 +187,29 @@ export default class extends LoggedInPage {
             }
         })
 
-        return (<Table   
-                    onRow={(record) => {
-                        return {
-                            onClick: () => {this.comfirm(record.index)},       // click row
-                        };
-                    }} 
-                    pagination = {false} dataSource={dataSource} columns={columns} scroll={{x: this.state.scroll}} 
-                />);
+        return (
+            <Table   
+                onRow={(record) => {
+                    return {
+                        onClick: () => {this.comfirm(record.index)},       // click row, index =  rowNumber
+                    };
+                }} 
+                pagination= {false} dataSource= {dataSource} columns= {columns} scroll= { {x: this.state.scroll} } 
+            />
+        );
     }
 
     ord_renderContent () {
-
         return (
             <Row>
                 <Col xs={0} sm={0} md={0} lg={2} xl={3}/>
                 <Col xs={24} sm={24} md={24} lg={20} xl={18}>
                 <Search
-                    placeholder="Wallet address"
-                    onSearch={value => this.searchByAddress(value)}
-                    style={{ width: 200 }}
+                    placeholder= "Wallet address"
+                    onSearch= {value => this.searchByAddress(value)}
+                    style= { { width: 200 } }
                 />
-                    {this.renderTable()}
+                    { this.renderTable() }
                 </Col>
             </Row>
         )

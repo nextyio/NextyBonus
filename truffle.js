@@ -12,10 +12,10 @@
  *   },
  */
 
-module.exports = {
+//module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
   // to customize your Truffle configuration!
-};
+//};
 
 require('dotenv').config();
 require('babel-register');
@@ -41,6 +41,14 @@ module.exports = {
       host: 'localhost',
       port: 8545,
       network_id: '*', // eslint-disable-line camelcase
+    },
+    testnetNexty: {
+      host: '125.212.250.61',
+      port: 11111,
+      gas: 21000,
+      gasPrice: 300000,
+      from: "0x6f53c8502bb884775e422c7c34be681554cee2ba",
+      network_id: 'testnetNexty', // eslint-disable-line camelcase
     },
     ropsten: {
       provider: ropstenProvider,

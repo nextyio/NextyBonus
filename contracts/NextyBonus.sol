@@ -83,10 +83,10 @@ contract NextyBonus {
 
     function deposit() public payable {
         require(!reEntrancyMutex);
-        reEntrancyMutex = true; 
+        reEntrancyMutex= true; 
         totalAmount= totalAmount.add(msg.value);
-        reEntrancyMutex = false; 
         emit OwnerDepositSuccess(msg.value);
+        reEntrancyMutex= false; 
     }
     
     function setFixedPercent(uint256 _percent) onlyOwner public {
@@ -98,11 +98,11 @@ contract NextyBonus {
     function ownerWithdraw(uint256 _amount) onlyOwner public {
         require(!reEntrancyMutex);
         require(_amount <= totalAmount);
-        reEntrancyMutex = true;
+        reEntrancyMutex= true;
         totalAmount= totalAmount.sub(_amount);
         owner.transfer(_amount);
-        reEntrancyMutex = false;
         emit OwnerWithdrawSuccess(_amount);
+        reEntrancyMutex= false;
     }
     
     function addMember(address _address) private {
@@ -141,7 +141,7 @@ contract NextyBonus {
     function createLockedAmount(address _address, uint256 _amount, uint256 _fixedPercent) onlyOwner public {
         if (_fixedPercent != FIXED_PERCENT) setFixedPercent(_fixedPercent);
         require(_amount <= totalAmount);
-        //require(whiteList[_address]);
+
         if (!whiteList[_address]) addMember(_address);
 
         uint256 newFixedAmount= _amount.mul(FIXED_PERCENT).div(100);
@@ -176,7 +176,7 @@ contract NextyBonus {
     function removeSpecificBonusAmount(address _address, uint256 _amountId) private returns(uint256) {
         //if still removeable, remove and add amount into totalAmount    
         if (bonusAmount[_address][_amountId].time + BONUS_REMOVEALBE_DURATION > now) {
-            uint256 value=bonusAmount[_address][_amountId].value;
+            uint256 value= bonusAmount[_address][_amountId].value;
             bonusAmount[_address][_amountId].lockStatus= StatusType.Removed;
             lockedAmount[_address]= lockedAmount[_address].sub(value);
             return value;
@@ -222,18 +222,18 @@ contract NextyBonus {
     function memberWithdraw() onlyMember public {
         require(!reEntrancyMutex);
 
-        address _address=msg.sender;
+        address _address= msg.sender;
         uint256 amount= unlockedAmount[_address]; // Withdraw amount
         require(amount > 0);  
 
-        reEntrancyMutex = true;
+        reEntrancyMutex= true;
         
         withdrawnAmount[_address]= withdrawnAmount[_address].add(amount);
         unlockedAmount[_address]= 0;
         setUnlockedToWithdrawn();
         _address.transfer(amount);
 
-        reEntrancyMutex = false; 
+        reEntrancyMutex= false; 
         emit MemberWithdrawSuccess(_address, amount);
     }
     
@@ -255,6 +255,7 @@ contract NextyBonus {
     
     function getFixedHistory(address _address, uint256 i) public view returns(uint256, uint256, uint256, uint256, bool){
         require(i < fixedAmount[_address].length);
+        
         uint256  time;
         uint256 endTime;
         uint256  value;
