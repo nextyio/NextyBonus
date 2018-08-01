@@ -170,7 +170,7 @@ export default class extends LoggedInPage {
         });
 
         const self= this;
-        this.props.ownerWithdraw(Number(this.state.amount) - EPSILON).then((result) => {
+        this.props.callFunction('ownerWithdraw',[Number(this.state.amount) - EPSILON]).then((result) => {
             if (!result) {
                 Message.error('Cannot send transaction!')
             }
