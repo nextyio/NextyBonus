@@ -63,7 +63,9 @@ export default class extends LoggedInPage {
         return false;
     }
 
-    comfirm(index) {
+    comfirm(dataSource, index) {
+        var removeable= dataSource[index][4]; //get bool removeable from smart contract output
+        if (!removeable) return false;
         const content = (
             <div>
                     This staff has been working very hard !!! 
@@ -191,7 +193,7 @@ export default class extends LoggedInPage {
             <Table   
                 onRow={(record) => {
                     return {
-                        onClick: () => {this.comfirm(record.index)},       // click row, index =  rowNumber
+                        onClick: () => {this.comfirm(dataSource, record.index)},       // click row, index =  rowNumber
                     };
                 }} 
                 pagination= {false} dataSource= {dataSource} columns= {columns} scroll= { {x: this.state.scroll} } 
@@ -204,11 +206,13 @@ export default class extends LoggedInPage {
             <Row>
                 <Col xs={0} sm={0} md={0} lg={2} xl={3}/>
                 <Col xs={24} sm={24} md={24} lg={20} xl={18}>
-                <Search
+                {this.props.is_admin &&
+                <Search 
                     placeholder= "Wallet address"
                     onSearch= {value => this.searchByAddress(value)}
                     style= { { width: 200 } }
                 />
+                }
                     { this.renderTable() }
                 </Col>
             </Row>
