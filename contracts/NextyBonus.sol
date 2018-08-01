@@ -5,8 +5,10 @@ import './SafeMath.sol';
 contract NextyBonus {
     using SafeMath for uint256;
     
-    uint256 public constant BONUS_REMOVEALBE_DURATION= 180*24*60*60; // 180 days in second
-    uint256 public constant LOCK_DURATION= 365*24*60*60; // 365 days in second
+    //uint256 public constant BONUS_REMOVEALBE_DURATION= 180*24*60*60; // 180 days in second
+    //uint256 public constant LOCK_DURATION= 365*24*60*60; // 365 days in second
+    uint256 public constant BONUS_REMOVEALBE_DURATION= 15; // 180 days in second
+    uint256 public constant LOCK_DURATION= 30; // 365 days in second
     
     uint256 public FIXED_PERCENT; //not constant
     uint256 public totalAmount= 0;
@@ -219,19 +221,19 @@ contract NextyBonus {
     
     function memberWithdraw() onlyMember public {
         require(!reEntrancyMutex);
-        uint256 amount= unlockedAmount[_address]; // Withdraw amount
-        require(amount > 0);
+
         address _address=msg.sender;
-        
-        updateStatus(_address);
-        
+        uint256 amount= unlockedAmount[_address]; // Withdraw amount
+        require(amount > 0);  
+
         reEntrancyMutex = true;
+        
         withdrawnAmount[_address]= withdrawnAmount[_address].add(amount);
         unlockedAmount[_address]= 0;
         setUnlockedToWithdrawn();
         _address.transfer(amount);
+
         reEntrancyMutex = false; 
-        
         emit MemberWithdrawSuccess(_address, amount);
     }
     
@@ -251,34 +253,38 @@ contract NextyBonus {
         return withdrawnAmount[_address];
     }
     
-    function getFixedHistory(address _address, uint256 i) public view returns(uint256, uint256, uint256, uint256){
+    function getFixedHistory(address _address, uint256 i) public view returns(uint256, uint256, uint256, uint256, bool){
         require(i < fixedAmount[_address].length);
         uint256  time;
         uint256 endTime;
         uint256  value;
         StatusType  lockStatus;
+        bool removeable;
         
         time= fixedAmount[_address][i].time;
         endTime= fixedAmount[_address][i].endTime;
         value= fixedAmount[_address][i].value;
         lockStatus= fixedAmount[_address][i].lockStatus;
+        removeable= false;
         
-        return (time, endTime, value, uint256(lockStatus));
+        return (time, endTime, value, uint256(lockStatus), removeable);
     }
     
-    function getBonusHistory(address _address, uint256 i) public view returns(uint256, uint256, uint256, uint256){
+    function getBonusHistory(address _address, uint256 i) public view returns(uint256, uint256, uint256, uint256, bool){
         require(i < bonusAmount[_address].length);
         uint256  time;
         uint256 endTime;
         uint256  value;
         StatusType  lockStatus;
+        bool removeable;
         
         time= bonusAmount[_address][i].time;
         endTime= bonusAmount[_address][i].endTime;
         value= bonusAmount[_address][i].value;
         lockStatus= bonusAmount[_address][i].lockStatus;
+        removeable= (time + BONUS_REMOVEALBE_DURATION > now);
         
-        return (time, endTime, value, uint256(lockStatus));
+        return (time, endTime, value, uint256(lockStatus), removeable);
     }
 
     function getHistoryLength(address _address) public view returns(uint256){

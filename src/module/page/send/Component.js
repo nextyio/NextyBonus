@@ -29,6 +29,7 @@ export default class extends LoggedInPage {
     }
 
     loadData() {
+    
         //this.props.deposit(1)
         this.setState({
             addressError: "invalid walletAddress",

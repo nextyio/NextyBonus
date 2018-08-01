@@ -1,16 +1,12 @@
 import React from 'react'
 import BaseComponent from '@/model/BaseComponent'
-import {Layout, Menu, Icon, Badge, Avatar, Modal, Dropdown, Button} from 'antd'
+import {Layout, Menu, Icon, Modal } from 'antd'
 import _ from 'lodash'
 import I18N from '@/I18N'
-const { Header, Sider, Content } = Layout
+const { Sider } = Layout
 
 import {USER_ROLE} from '@/constant';
 import './style.scss';
-
-// const {Header} = Layout;
-const SubMenu = Menu.SubMenu
-const MenuItemGroup = Menu.ItemGroup
 
 function isMobileDevice() {
     return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobi l e') !== -1);
@@ -104,11 +100,6 @@ loadData() {
                         </Menu.Item>
                     }
                     { isAdmin &&
-                        <Menu.Item key="return">
-                            <Icon type="wallet" /> {I18N.get('0005')}
-                        </Menu.Item>
-                    }
-                    { isAdmin &&
                         <Menu.Item key="deposit">
                             <Icon type="wallet" /> {I18N.get('0002')}
                         </Menu.Item>
@@ -135,7 +126,6 @@ loadData() {
         if (_.includes([
             'history',
             'send',
-            'return',
             'deposit',
             'withdraw',
             'claim',
@@ -164,7 +154,6 @@ loadData() {
         let sidebar = [
             'history',
             'send',
-            'return',
             'deposit',
             'withdraw',
             'claim'

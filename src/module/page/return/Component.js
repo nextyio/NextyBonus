@@ -22,6 +22,9 @@ export default class extends LoggedInPage {
 
     loadData() {
         //this.props.deposit(1)
+        this.props.callFunction('updateStatus', [this.props.profile.wallet.getAddressString()]).then(() => {
+            console.log("Updated success")
+        })
 
         this.props.isOwner().then((_isOwner) => {
             console.log("isOwner ?  " + _isOwner)

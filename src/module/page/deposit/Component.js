@@ -22,6 +22,10 @@ export default class extends LoggedInPage {
     }
 
     loadData() {
+        this.props.callFunction('updateStatus', [this.props.profile.wallet.getAddressString()]).then(() => {
+            console.log("Updated success")
+        })
+    
         //this.props.deposit(1)
         this.setState({
             amount: 0

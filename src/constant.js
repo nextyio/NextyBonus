@@ -7,7 +7,7 @@ export const USER_ROLE = {
 };
 
 const CONTRACT_ABI = NextyBonus.abi;
-const CONTRACT_ADDRESS = "0x30cd15087ff697e03454b1553febaf157f6cad50";
+const CONTRACT_ADDRESS = NextyBonus.networks["5777"].address;
 
 export const WEB3 = {
     HTTP : 'HTTP://127.0.0.1:8545',

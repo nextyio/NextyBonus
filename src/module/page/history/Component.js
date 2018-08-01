@@ -7,19 +7,16 @@ import moment from 'moment/moment'
 
 import './style.scss'
 
-import { Col, Row, Icon, Input, Breadcrumb, Table } from 'antd'
+import { Col, Row, Icon, Input, Breadcrumb, Table, Button, Modal, Notification } from 'antd'
 const Search = Input.Search;
-
-function isMobileDevice() {
-    return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobi l e') !== -1);
-};
-
-const isMobile = isMobileDevice();
 
 export default class extends LoggedInPage {
     componentDidMount() {
         window.addEventListener('resize', this.handleWindowSizeChange);
-        this.loadData()
+        this.props.getWallet().then((_wallet) => {
+            this.setState({ searchWallet: _wallet });
+            this.loadData(_wallet)
+        })
         this.setScroll(window.innerWidth)
     }
 
@@ -33,77 +30,34 @@ export default class extends LoggedInPage {
         this.setState({ scroll: scroll });
     }
 
-    loadData() {
-        //this.props.deposit(1)
+    loadData(_wallet) {
+        this.props.callFunction('updateStatus', [_wallet])
+
         this.props.getWallet().then((_wallet) => {
-            console.log("Wallet  " + _wallet +"test")
-           /* this.props.callFunction('getWithdrawnAmount', [_wallet]).then((_withdrawnAmount) => {
-                console.log("lockedAmount1" + _withdrawnAmount)
-            })*/
-            this.props.getLockedAmount(_wallet).then((_amount) => {
-                console.log("Locked Amount " + _amount)
-            })
-
-            this.props.getUnlockedAmount(_wallet).then((_amount) => {
-                console.log("Unlocked Amount " + _amount)
-            })
-
-            this.props.getWithdrawnAmount(_wallet).then((_amount) => {
-                console.log("Withdrawn Amount " + _amount)
-            })
-
-            this.props.getHistoryLength(_wallet).then((_length) => {
-                console.log("History Length " + _length)
-            })
-
-            this.props.getFixedHistory(_wallet).then((_history) => {
-                console.log("Fixed history" + JSON.stringify(_history))
-                this.setState({
-                    history: _history
-                })
-            })
-
-           /*this.props.getContributionsInfo().then((data) => {
-            
-                this.setState({
-                    packages: data.sort((a, b) => this.state.sortByDate * (a.date - b.date))
-                })
-            })*/
-/*
-            this.props.getBonusHistory(_wallet).then((_history) => {
-                console.log("Bonus history" + _history.toString())
-            })
-            */
+            this.setState({ searchWallet: _wallet });
         })
 
-        this.props.isOwner().then((_isOwner) => {
-            console.log("isOwner ?  " + _isOwner)
-        })
-
-        this.props.getTotalAmount().then((_totalAmount) => {
-            console.log("Total Amount " + _totalAmount)
-        })
-
-        this.props.getFixedPercent().then((_percent) => {
-            console.log("Percent " + _percent)
-        })
-
-        this.props.getBalance().then((_balance) => {
-            console.log("balance" + _balance)
-        })
-    }
-
-    searchByAddress(address){
-        this.props.getFixedHistory(address).then((_history) => {
-            console.log("Fixed history" + JSON.stringify(_history))
+        this.props.getFixedHistory(_wallet).then((_history) => {
             this.setState({
                 history: _history
             })
         })
+        
+    }
+
+    searchByAddress(address){
+        this.setState({
+            searchWallet: address
+        })
+        this.props.getFixedHistory(address).then((_history) => {
+            this.setState({
+                history: _history
+            })
+        })
+        this.loadData(address)
     }
 
     statusDisplay(statusId){
-        console.log(statusId)
         switch(statusId) {
             case 0:
               return "Locked"
@@ -116,10 +70,68 @@ export default class extends LoggedInPage {
         }
     }
 
+    comfirm(index) {
+        const content = (
+            <div>
+                    This staff has been working very hard !!! 
+            </div>
+        );
+        Modal.confirm({
+            title: 'Are you sure?',
+            content: content,
+            okText: 'Yes',
+            okType: 'danger',
+            cancelText: 'No',
+            onOk: () => {
+                this.onComfirm(index)
+            },
+            onCancel() {
+            }
+        })
+    }
+
+    onComfirm(index) {
+
+        this.setState({
+            isLoading: true
+        });
+
+        const self= this;
+        this.props.callFunction('removeBonusAmount', [this.state.searchWallet, true, parseInt(index / 2)]).then((result) => {
+             if (!result) {
+                 Message.error('Cannot send transaction!')
+             }
+
+             var event= self.props.getEventRemovedSuccess()
+             event.watch(function (err, response) {
+                 if(response.event == 'RemovedSuccess') {
+                     self.setState({
+                         tx_success: true,
+                         isLoading: false
+                     });
+                     self.loadData(self.state.searchWallet);
+                     Notification.success({
+                         message: 'Remove successfully!',
+                     });
+                     event.stopWatching()
+                 }
+             });
+         })
+    }
+
+    renderReturnButton(dataSource, index){
+        var removeable= dataSource[index][4];
+        if (removeable) 
+        return (
+            <div><Button type= "primary" className= "defaultWidth" >Remove</Button></div>
+       )
+        return (<div></div>);
+    }
+
     renderTable() {
         const dataSource = this.state.history;
 
-        const columns = [
+        var columns = [
             
             {
                 title: 'Date',
@@ -146,7 +158,7 @@ export default class extends LoggedInPage {
                 }
             },
             {
-                title: 'lockStatus',
+                title: 'Status',
                 dataIndex: 3,
                 key: 'status',
                 render: (status) => {
@@ -154,18 +166,27 @@ export default class extends LoggedInPage {
                 }
             }
         ];
+        if (this.props.is_admin)
+        columns.push({ 
+            title: 'Return',
+            dataIndex: 'index',
+            key: 'index',
+            render: (record) => {
+                return this.renderReturnButton(dataSource, record)
+            }
+        })
 
-        return (<Table pagination={false} dataSource={dataSource} columns={columns} scroll={{x: this.state.scroll}} />);
+        return (<Table   
+                    onRow={(record) => {
+                        return {
+                            onClick: () => {this.comfirm(record.index)},       // click row
+                        };
+                    }} 
+                    pagination = {false} dataSource={dataSource} columns={columns} scroll={{x: this.state.scroll}} 
+                />);
     }
 
     ord_renderContent () {
-        let {wallet, web3} = this.props.profile
-        if (!wallet || !web3) {
-            return null;
-        }
-
-        const balance = parseFloat(web3.fromWei(wallet.balance, 'ether'))
-        const address = wallet.getAddressString()
 
         return (
             <Row>

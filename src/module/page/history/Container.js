@@ -79,5 +79,8 @@ export default createContainer(Component, (state) => {
         isOwner() {
             return contractService.isOwner()
         },
+        getEventRemovedSuccess() {
+            return contractService.getEventRemovedSuccess()
+        }
     }
 })

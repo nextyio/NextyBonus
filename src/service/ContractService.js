@@ -13,7 +13,6 @@ export default class extends BaseService {
         
         const functionDef = new SolidityFunction('', _.find(WEB3.ABI, { name: functionName }), '')
         const payloadData = functionDef.toPayload(params).data
-        //console.log("check" + wallet.getAddressString())
 
         const nonce = web3.eth.getTransactionCount(wallet.getAddressString())
         const rawTx = {
@@ -24,9 +23,10 @@ export default class extends BaseService {
             data: payloadData
         }
         
-        const gas = this.estimateGas(rawTx)
+        //const gas = this.estimateGas(rawTx)
+        const gas = 6000000
         rawTx.gas = gas
-        //console.log("check" + rawTx)
+
         return this.sendRawTransaction(rawTx)
     }
 
@@ -139,6 +139,15 @@ export default class extends BaseService {
 
     //Public Functions
 
+    async updateStatus(address) {
+        const storeUser = this.store.getState().user
+        let {contract} = storeUser.profile
+        if (!contract) {
+            return
+        }
+        return contract.updateStatus(address)
+    }
+
     async getLockedAmount(address) {
         const storeUser = this.store.getState().user
         let {contract} = storeUser.profile
@@ -241,24 +250,33 @@ export default class extends BaseService {
     //Events
 
     getEventOwnerDeposit() {
-        console.log("ok")
         const storeUser = this.store.getState().user
         let {contract, web3, wallet} = storeUser.profile
         return contract.OwnerDepositSuccess()
     }
 
     getEventOwnerWithdraw() {
-        console.log("ok")
         const storeUser = this.store.getState().user
         let {contract, web3, wallet} = storeUser.profile
         return contract.OwnerWithdrawSuccess()
     }
 
     getEventCreatedSuccess() {
-        console.log("Created ?")
         const storeUser = this.store.getState().user
         let {contract, web3, wallet} = storeUser.profile
         return contract.CreatedSuccess()
+    }
+
+    getEventMemberWithdraw() {
+        const storeUser = this.store.getState().user
+        let {contract, web3, wallet} = storeUser.profile
+        return contract.MemberWithdrawSuccess()
+    }
+
+    getEventRemovedSuccess() {
+        const storeUser = this.store.getState().user
+        let {contract, web3, wallet} = storeUser.profile
+        return contract.RemovedSuccess()
     }
 
 }
