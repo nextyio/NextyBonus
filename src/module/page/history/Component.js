@@ -130,12 +130,20 @@ export default class extends LoggedInPage {
         )
     }
 
-    renderAmount(amountString, decimalNumber, convert) {
+    renderAmount(amountString, decimalNumber, convert, dataSource, record) {
+        
+        var i= record.index;
+        if (i % 2 == 1) i--;
+        var a= Number(dataSource[i][2].toString());
+        var b= Number(dataSource[i+1][2].toString());
+        var aPercent= this.numberDisplay(a/(a+b) * 100)
+        var bPercent= this.numberDisplay(b/(a+b) * 100)
+        
         var mul=1
         if (convert == 'toEther') mul= 1e-18
         if (convert == 'toWei') mul= 1e18
         return (
-            <p>{(parseFloat(amountString * mul).toFixed(decimalNumber))} NTY</p>
+                <p>{(parseFloat(amountString * mul).toFixed(decimalNumber))} NTY/{record.index % 2 == 0 ? aPercent : bPercent} %</p>
         )
     }
 
@@ -164,8 +172,8 @@ export default class extends LoggedInPage {
                 title: 'Amount',
                 dataIndex: 2,
                 key: 'amount',
-                render: (amount) => {
-                    return this.renderAmount(amount, 2, 'toEther')
+                render: (amount, record) => {
+                    return this.renderAmount(amount, 2, 'toEther', dataSource, record)
                 }
             },
             {
@@ -196,6 +204,7 @@ export default class extends LoggedInPage {
                         onClick: () => {this.comfirm(dataSource, record.index)},       // click row, index =  rowNumber
                     };
                 }} 
+                rowClassName={(record, index) => index % 2 == 1 ? 'highlightRow' : '' }
                 pagination= {false} dataSource= {dataSource} columns= {columns} scroll= { {x: this.state.scroll} } 
             />
         );
@@ -226,5 +235,9 @@ export default class extends LoggedInPage {
                 <Breadcrumb.Item> History</Breadcrumb.Item>
             </Breadcrumb>
         );
+    }
+
+    numberDisplay(value) {
+        return Number(value).toFixed(2)
     }
 }
