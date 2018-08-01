@@ -96,7 +96,7 @@ export default class extends BaseService {
         if (!contract) {
             return
         }
-        return contract.ownerWithdraw(amount*1e18)
+        return contract.ownerWithdraw(amount * 1e18)
     }
 
     async setFixedPercent(percent) {
@@ -190,11 +190,11 @@ export default class extends BaseService {
             var fixedHistoryById = contract.getFixedHistory(address, i)
 
             history.push({
-                index: i*2,
+                index: i * 2,
                 ...fixedHistoryById
             })
             history.push({
-                index: i*2 + 1,
+                index: i * 2 + 1,
                 ...bonusHistoryById
             })
         }
@@ -252,30 +252,45 @@ export default class extends BaseService {
     getEventOwnerDeposit() {
         const storeUser = this.store.getState().user
         let {contract, web3, wallet} = storeUser.profile
+        if (!contract) {
+            return
+        }
         return contract.OwnerDepositSuccess()
     }
 
     getEventOwnerWithdraw() {
         const storeUser = this.store.getState().user
         let {contract, web3, wallet} = storeUser.profile
+        if (!contract) {
+            return
+        }
         return contract.OwnerWithdrawSuccess()
     }
 
     getEventCreatedSuccess() {
         const storeUser = this.store.getState().user
         let {contract, web3, wallet} = storeUser.profile
+        if (!contract) {
+            return
+        }
         return contract.CreatedSuccess()
     }
 
     getEventMemberWithdraw() {
         const storeUser = this.store.getState().user
         let {contract, web3, wallet} = storeUser.profile
+        if (!contract) {
+            return
+        }
         return contract.MemberWithdrawSuccess()
     }
 
     getEventRemovedSuccess() {
         const storeUser = this.store.getState().user
         let {contract, web3, wallet} = storeUser.profile
+        if (!contract) {
+            return
+        }
         return contract.RemovedSuccess()
     }
 
