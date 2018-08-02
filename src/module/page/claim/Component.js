@@ -17,6 +17,12 @@ export default class extends LoggedInPage {
                 console.log("Updated success")
         })
 
+        this.props.getRemoveableAmount(this.props.profile.wallet.getAddressString()).then((_amount) => {
+            this.setState({
+                removeableAmount: this.numberDisplay(Number(_amount)*1e-18),
+            })
+        })
+
         this.props.getLockedAmount(this.props.profile.wallet.getAddressString()).then((_amount) => {
             this.setState({
                 lockedAmount: this.numberDisplay(Number(_amount)*1e-18),
@@ -82,7 +88,25 @@ export default class extends LoggedInPage {
                     </Row>
 
                     <Row className= "defaultPadding">
-                        <Col xs={24} sm={24} md={12} lg={24} xl={24} className= "centerDraw defaultWidth defaultPadding">
+                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                            a amount
+                        </Col>
+                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                            {this.state.lockedAmount - this.state.removeableAmount} NTY
+                        </Col>
+                    </Row>
+
+                    <Row className= "defaultPadding">
+                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                            b amount
+                        </Col>
+                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                            {this.state.removeableAmount} NTY
+                        </Col>
+                    </Row>
+
+                    <Row className= "defaultPadding">
+                        <Col xs={24} sm={24} md={12} lg={24} xl={24} className= "centerDraw defaultWidth defaultPadding textBlue">
                             Avaiable withdraw amount: {this.state.unlockedAmount} NTY
                         </Col>
                     </Row>

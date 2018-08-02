@@ -52,6 +52,9 @@ export default createContainer(Component, (state) => {
         updateStatus(_address) {
             return contractService.updateStatus(_address)
         },
+        async getRemoveableAmount(_address) {
+            return await contractService.getRemoveableAmount(_address)
+        },
         getLockedAmount(_address) {
             return contractService.getLockedAmount(_address)
         },
