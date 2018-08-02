@@ -7,8 +7,8 @@ contract NextyBonus {
     
     //uint256 public constant BONUS_REMOVEALBE_DURATION= 180*24*60*60; // 180 days in second
     //uint256 public constant LOCK_DURATION= 365*24*60*60; // 365 days in second
-    uint256 public constant BONUS_REMOVEALBE_DURATION= 15; // 180 days in second
-    uint256 public constant LOCK_DURATION= 30; // 365 days in second
+    uint256 public constant BONUS_REMOVEALBE_DURATION= 5*60; // 180 days in second
+    uint256 public constant LOCK_DURATION= 10*60; // 365 days in second
     
     uint256 public FIXED_PERCENT; //not constant
     uint256 public totalAmount= 0;
@@ -88,7 +88,7 @@ contract NextyBonus {
         emit ChangePercentSuccess(_percent);
     }
     
-    function ownerWithdraw(uint256 _amount) onlyOwner public {
+    function ownerWithdraw(uint256 _amount) onlyOwner payable public {
         require(!reEntrancyMutex);
         require(_amount <= totalAmount);
         reEntrancyMutex= true;

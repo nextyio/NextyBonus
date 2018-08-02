@@ -22,10 +22,8 @@ export default class extends BaseService {
             to: contract.address,
             data: payloadData
         }
-        
         const gas = this.estimateGas(rawTx)
         rawTx.gas = gas
-
         return this.sendRawTransaction(rawTx)
     }
 
