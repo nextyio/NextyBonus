@@ -22,39 +22,24 @@ export default class extends LoggedInPage {
     }
 
     loadData() {
-        //this.props.deposit(1)
         this.setState({
             amount: 0
-        })
-
-        this.props.isOwner().then((_isOwner) => {
-            console.log("isOwner ?  " + _isOwner)
         })
 
         this.props.getTotalAmount().then((_totalAmount) => {
             this.setState({
                 totalAmount: _totalAmount * 1e-18
             })
-            console.log("Total Amount " + _totalAmount)
-        })
-
-        this.props.getFixedPercent().then((_percent) => {
-            console.log("Percent " + _percent)
         })
 
         this.props.getBalance().then((_balance) => {
             this.setState({
                 balance: _balance
             })
-            console.log("balance" + _balance)
         })
     }
 
     ord_renderContent () {
-        let {wallet, web3} = this.props.profile
-        if (!wallet || !web3) {
-            return null;
-        }
 
         return (
             <div>
@@ -109,7 +94,6 @@ export default class extends LoggedInPage {
 
     validValue(value) {
         var deciPart= (value + ".").split(".")[1];
-      //   console.log(deciPart)
         if (deciPart.length > 2) {return value.toFixed(2)} else {return value};
     }
 
@@ -170,15 +154,14 @@ export default class extends LoggedInPage {
         });
 
         const self= this;
-        this.props.callFunction('ownerWithdraw',[Number(this.state.amount) - EPSILON]).then((result) => {
+        this.props.callFunction('ownerWithdraw',[(Number(this.state.amount) - EPSILON) * 1e18]).then((result) => {
             if (!result) {
                 Message.error('Cannot send transaction!')
             }
             
             var event= self.props.getEventOwnerWithdraw()
-            console.log(event)
             event.watch(function (err, response) {
-                console.log("withdraw success")
+                //console.log("withdraw success")
                 if(response.event == 'OwnerWithdrawSuccess') {
                     self.setState({
                         tx_success: true,
