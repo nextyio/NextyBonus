@@ -100,7 +100,12 @@ export default class extends LoggedInPage {
 
              var event= self.props.getEventRemovedSuccess()
              event.watch(function (err, response) {
-                 if(response.event == 'RemovedSuccess') {
+                 console.log(response.args._amount.toString())
+                 if (response.event == 'RemovedSuccess') {
+                    if (Number(response.args._amount) == 0) {
+                        self.loadData(self.state.searchWallet);
+                        return;
+                    }
                      self.setState({
                          tx_success: true,
                          isLoading: false
