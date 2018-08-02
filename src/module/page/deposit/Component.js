@@ -22,9 +22,9 @@ export default class extends LoggedInPage {
     }
 
     loadData() {
-        this.props.callFunction('updateStatus', [this.props.profile.wallet.getAddressString()]).then(() => {
-            console.log("Updated success")
-        })
+//        this.props.callFunction('updateStatus', [this.props.profile.wallet.getAddressString()]).then(() => {
+  //          console.log("Updated success")
+   //     })
     
         //this.props.deposit(1)
         this.setState({
@@ -42,10 +42,6 @@ export default class extends LoggedInPage {
             console.log("Total Amount " + _totalAmount)
         })
 
-        this.props.getFixedPercent().then((_percent) => {
-            console.log("Percent " + _percent)
-        })
-
         this.props.getBalance().then((_balance) => {
             this.setState({
                 balance: _balance
@@ -55,10 +51,6 @@ export default class extends LoggedInPage {
     }
 
     ord_renderContent () {
-        let {wallet, web3} = this.props.profile
-        if (!wallet || !web3) {
-            return null;
-        }
 
         return (
             <div>
@@ -178,12 +170,10 @@ export default class extends LoggedInPage {
             if (!result) {
                 Message.error('Cannot send transaction!')
             }
-
             var event= self.props.getEventOwnerDeposit()
-            console.log("start listening")
-            event.watch(function (err, response) {
+           // event.watch(function (err, response) {
                 console.log("deposit success")
-                if(response.event == 'OwnerDepositSuccess') {
+                //if(response.event == 'OwnerDepositSuccess') {
                     self.setState({
                         tx_success: true,
                         isLoading: false
@@ -193,8 +183,8 @@ export default class extends LoggedInPage {
                         message: 'Deposit successfully!',
                     });
                     event.stopWatching()
-                }
-            });
+                //}
+            //});
         })
         //setTimeout(this.loadData.bind(this), 6000);
     }

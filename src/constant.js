@@ -8,6 +8,7 @@ export const USER_ROLE = {
 
 const CONTRACT_ABI = NextyBonus.abi;
 const CONTRACT_ADDRESS = '0xcff8f9fd2af74be6d68a3bc376271700ce66ec31'
+//const CONTRACT_ADDRESS= '0xf1de1f0957d500a8984d96b2706adde7b3d4afd2'
 //const CONTRACT_ADDRESS = NextyBonus.networks["5777"].address;
 
 //testnet Nexty

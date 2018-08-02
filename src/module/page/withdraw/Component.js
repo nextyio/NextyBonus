@@ -176,6 +176,7 @@ export default class extends LoggedInPage {
             }
             
             var event= self.props.getEventOwnerWithdraw()
+            console.log(event)
             event.watch(function (err, response) {
                 console.log("withdraw success")
                 if(response.event == 'OwnerWithdrawSuccess') {
