@@ -73,13 +73,6 @@ contract NextyBonus {
         setFixedPercent(_percent);
         addMember(msg.sender); // owner at 1st place in the member array
     }
-    
-    function () public payable {
-        require(!reEntrancyMutex);
-        reEntrancyMutex = true; 
-        totalAmount= totalAmount.add(msg.value);
-        reEntrancyMutex = false; 
-    }
 
     function deposit() public payable {
         require(!reEntrancyMutex);

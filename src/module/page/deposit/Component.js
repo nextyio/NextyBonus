@@ -22,31 +22,20 @@ export default class extends LoggedInPage {
     }
 
     loadData() {
-//        this.props.callFunction('updateStatus', [this.props.profile.wallet.getAddressString()]).then(() => {
-  //          console.log("Updated success")
-   //     })
-    
-        //this.props.deposit(1)
         this.setState({
             amount: 0
-        })
-
-        this.props.isOwner().then((_isOwner) => {
-            console.log("isOwner ?  " + _isOwner)
         })
 
         this.props.getTotalAmount().then((_totalAmount) => {
             this.setState({
                 totalAmount: _totalAmount * 1e-18
             })
-            console.log("Total Amount " + _totalAmount)
         })
 
         this.props.getBalance().then((_balance) => {
             this.setState({
                 balance: _balance
             })
-            console.log("balance" + _balance)
         })
     }
 
@@ -171,9 +160,9 @@ export default class extends LoggedInPage {
                 Message.error('Cannot send transaction!')
             }
             var event= self.props.getEventOwnerDeposit()
-           // event.watch(function (err, response) {
-                console.log("deposit success")
-                //if(response.event == 'OwnerDepositSuccess') {
+            event.watch(function (err, response) {
+                //console.log("deposit success")
+                if(response.event == 'OwnerDepositSuccess') {
                     self.setState({
                         tx_success: true,
                         isLoading: false
@@ -183,10 +172,9 @@ export default class extends LoggedInPage {
                         message: 'Deposit successfully!',
                     });
                     event.stopWatching()
-                //}
-            //});
+                }
+            });
         })
-        //setTimeout(this.loadData.bind(this), 6000);
     }
 
     numberDisplay(value) {

@@ -24,7 +24,6 @@ export default class extends BaseService {
         }
         
         const gas = this.estimateGas(rawTx)
-        //const gas = 6000000
         rawTx.gas = gas
 
         return this.sendRawTransaction(rawTx)
@@ -62,8 +61,8 @@ export default class extends BaseService {
         const storeUser = this.store.getState().user
         let {contract, web3, wallet} = storeUser.profile
 
-        //const functionDef = new SolidityFunction('', _.find(WEB3.ABI, { name: 'deposit' }), '')
-        //const payloadData = functionDef.toPayload([packageId]).data
+        const functionDef = new SolidityFunction('', _.find(WEB3.ABI, { name: 'deposit' }), '')
+        const payloadData = functionDef.toPayload([]).data
         const nonce = web3.eth.getTransactionCount(wallet.getAddressString())
 
         const rawTx = {
@@ -71,8 +70,7 @@ export default class extends BaseService {
             from: wallet.getAddressString(),
             value: web3.toWei(amount, "ether"),
             to: contract.address,
-            //data: payloadData
-            data: null
+            data: payloadData
         }
 
         const gas = this.estimateGas(rawTx)
