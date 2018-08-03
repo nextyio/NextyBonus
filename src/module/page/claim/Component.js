@@ -92,7 +92,7 @@ export default class extends LoggedInPage {
                             a amount
                         </Col>
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            {this.state.lockedAmount - this.state.removeableAmount} NTY
+                            {this.numberDisplay(this.state.lockedAmount - this.state.removeableAmount)} NTY
                         </Col>
                     </Row>
 
