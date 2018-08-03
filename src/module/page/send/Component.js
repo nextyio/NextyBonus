@@ -116,7 +116,10 @@ export default class extends LoggedInPage {
                                 className= "defaultWidth"
                                 min={0}
                                 max={100}
+                                formatter={value => `${parseInt(value)}%`}
+                                parser={value => value.replace('%', '')}
                                 defaultValue= {Number(this.state.currentPercent)}
+                                //defaultValue= {100}
                                 value= {this.state.setPercent}
                                 onChange= {this.onPercentChange.bind(this)}
                             />
@@ -175,7 +178,7 @@ export default class extends LoggedInPage {
     };
 
     onToWalletChange(e) {
-        console.log(this.isWalletAddress(e.target.value))
+        //console.log(this.isWalletAddress(e.target.value))
         if (!this.isWalletAddress(e.target.value)) {
             this.setState({
                 addressError: "invalid walletAddress",
@@ -196,7 +199,7 @@ export default class extends LoggedInPage {
         console.log(value);
         if ((value != parseInt(value)) || (value < 0) || (value >100)) {
             this.setState({
-                percentError: "invalid input",
+                percentError: "Percent must be a posivtive integer number in range [0,100]",
             })
         } else
         this.setState({
@@ -212,13 +215,18 @@ export default class extends LoggedInPage {
     onAmountChange(value) {
         if (isNaN(value)) {
             this.setState({
-                amountError: "invalid input",
+                amountError: "Amount must be a number",
             })
         } else 
+        if (this.state.totalAmount <= 0 ) {
+            this.setState({
+                amountError: "Amount must be greater than 0",
+            })
+        } else
         if (this.state.totalAmount + EPSILON < value ) {
-        this.setState({
-            amountError: "Pool is not enough to send",
-        })
+            this.setState({
+                amountError: "Amount cannot be exceeded current balance",
+            })
         } else
         this.setState({
             amountError: null
@@ -231,24 +239,27 @@ export default class extends LoggedInPage {
     }
 
     confirm() {
+        var error = false;
         if (this.state.percentError) {
             Notification.error({
                 message: this.state.percentError,
             });
-            return false;
+            error = true;
         }
         if (this.state.addressError) {
             Notification.error({
                 message: this.state.addressError,
             });
-            return false;
+            error = true;
         }
         if (this.state.amountError) {
             Notification.error({
                 message: this.state.amountError,
             });
-            return false;
+            error = true;
         }
+
+        if (error) return false;
 
         const content = (
             <div>
