@@ -197,15 +197,18 @@ export default class extends BaseService {
         var history = []
 
         for (let i = 0; i < historyLength; i++) {
-            var bonusHistoryById = contract.getBonusHistory(address, i)
-            var fixedHistoryById = contract.getFixedHistory(address, i)
+        //for (let i = historyLength-1; i >= 0; i--) {
+            var bonusHistoryById = contract.getBonusHistory(address, historyLength - i - 1)
+            var fixedHistoryById = contract.getFixedHistory(address, historyLength - i - 1)
 
             history.push({
                 index: i * 2,
+                amountId: historyLength - i - 1,
                 ...fixedHistoryById
             })
             history.push({
                 index: i * 2 + 1,
+                amountId: historyLength - i - 1,
                 ...bonusHistoryById
             })
         }

@@ -79,7 +79,7 @@ export default class extends LoggedInPage {
             okType: 'danger',
             cancelText: 'No',
             onOk: () => {
-                this.onComfirm(index)
+                this.onComfirm(dataSource[index]['amountId'])
             },
             onCancel() {
             }
@@ -93,7 +93,7 @@ export default class extends LoggedInPage {
         });
 
         const self= this;
-        this.props.callFunction('removeBonusAmount', [this.state.searchWallet, true, parseInt(index / 2)]).then((result) => {
+        this.props.callFunction('removeBonusAmount', [this.state.searchWallet, true, parseInt(index)]).then((result) => {
              if (!result) {
                  Message.error('Cannot send transaction!')
              }
@@ -122,6 +122,8 @@ export default class extends LoggedInPage {
 
     renderReturnButton(dataSource, index){
         var removeable= dataSource[index][4]; //get bool removeable from smart contract output
+        console.log(index)
+        //console.log(dataSource[index])
         if (removeable) 
         return (
             <div><Button type= "primary" className= "defaultWidth" >Remove</Button></div>
