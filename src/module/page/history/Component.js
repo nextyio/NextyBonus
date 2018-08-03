@@ -153,7 +153,7 @@ export default class extends LoggedInPage {
     }
 
     renderTable() {
-        const dataSource = this.state.history;
+        var dataSource = this.state.history;
 
         var columns = [
             
@@ -198,7 +198,7 @@ export default class extends LoggedInPage {
             dataIndex: 'index',
             key: 'index',
             render: (record) => {
-                return this.renderReturnButton(dataSource, record)
+                return this.renderReturnButton(this.state.history, record)
             }
         })
 
@@ -206,11 +206,11 @@ export default class extends LoggedInPage {
             <Table   
                 onRow={(record) => {
                     return {
-                        onClick: () => {this.comfirm(dataSource, record.index)},       // click row, index =  rowNumber
+                        onClick: () => {this.comfirm(this.state.history, record.index)},       // click row, index =  rowNumber
                     };
                 }} 
                 rowClassName={(record, index) => index % 2 == 1 ? 'highlightRow' : '' }
-                pagination= {false} dataSource= {dataSource} columns= {columns} scroll= { {x: this.state.scroll} } 
+                pagination= {false} dataSource= {this.state.history} columns= {columns} scroll= { {x: this.state.scroll} } 
             />
         );
     }

@@ -55,8 +55,8 @@ export default createContainer(Component, (state) => {
         async getRemoveableAmount(_address) {
             return await contractService.getRemoveableAmount(_address)
         },
-        getLockedAmount(_address) {
-            return contractService.getLockedAmount(_address)
+        async getLockedAmount(_address) {
+            return await contractService.getLockedAmount(_address)
         },
         async getUnlockedAmount(_address) {
             return await contractService.getUnlockedAmount(_address)

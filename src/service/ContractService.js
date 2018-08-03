@@ -144,6 +144,21 @@ export default class extends BaseService {
         return contract.updateStatus(address)
     }
 
+    async getRemoveableAmount(address) {
+        const storeUser = this.store.getState().user
+        let {contract} = storeUser.profile
+        if (!contract) {
+            return
+        }
+        var historyLength = contract.getHistoryLength(address)
+        var result = 0
+        for (let i = 0; i < historyLength; i++) {
+            var bonusHistoryById = contract.getBonusHistory(address, i)
+            if (bonusHistoryById[4]) result+= Number(bonusHistoryById[2].toString())
+        }
+        return result;
+    }
+
     async getLockedAmount(address) {
         const storeUser = this.store.getState().user
         let {contract} = storeUser.profile

@@ -153,14 +153,14 @@ contract NextyBonus {
             if ((bonusAmount[_address][i].lockStatus == StatusType.Locked) && 
             (bonusAmount[_address][i].endTime < now)){
                 bonusAmount[_address][i].lockStatus= StatusType.Unlocked;
-                lockedAmount[_address]-= bonusAmount[_address][i].value;
+                lockedAmount[_address]= lockedAmount[_address].sub(bonusAmount[_address][i].value);
                 unlockedAmount[_address]+= bonusAmount[_address][i].value;
             }
             
             if ((fixedAmount[_address][i].lockStatus == StatusType.Locked) && 
             (fixedAmount[_address][i].endTime < now)){
                 fixedAmount[_address][i].lockStatus= StatusType.Unlocked;
-                lockedAmount[_address]-= fixedAmount[_address][i].value;
+                lockedAmount[_address]=lockedAmount[_address].sub(fixedAmount[_address][i].value);
                 unlockedAmount[_address]+= fixedAmount[_address][i].value;
             }
         }
@@ -168,7 +168,7 @@ contract NextyBonus {
     
     function removeSpecificBonusAmount(address _address, uint256 _amountId) private returns(uint256) {
         //if still removeable, remove and add amount into totalAmount    
-        if (bonusAmount[_address][_amountId].time + BONUS_REMOVEALBE_DURATION > now) {
+        if ((bonusAmount[_address][_amountId].lockStatus == StatusType.Locked) && (bonusAmount[_address][_amountId].time + BONUS_REMOVEALBE_DURATION > now)) {
             uint256 value= bonusAmount[_address][_amountId].value;
             bonusAmount[_address][_amountId].lockStatus= StatusType.Removed;
             lockedAmount[_address]= lockedAmount[_address].sub(value);
@@ -276,7 +276,7 @@ contract NextyBonus {
         endTime= bonusAmount[_address][i].endTime;
         value= bonusAmount[_address][i].value;
         lockStatus= bonusAmount[_address][i].lockStatus;
-        removeable= (time + BONUS_REMOVEALBE_DURATION > now);
+        removeable= ((lockStatus == StatusType.Locked) && (time + BONUS_REMOVEALBE_DURATION > now));
         
         return (time, endTime, value, uint256(lockStatus), removeable);
     }
