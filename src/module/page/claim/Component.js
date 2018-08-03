@@ -262,7 +262,7 @@ export default class extends LoggedInPage {
                     });
                     self.loadData();
                     Notification.success({
-                        message: 'Sent successfully!',
+                        message: 'Claim successfully!',
                     });
                     event.stopWatching()
                 }
