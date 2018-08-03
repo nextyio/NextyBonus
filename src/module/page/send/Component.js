@@ -218,7 +218,7 @@ export default class extends LoggedInPage {
                 amountError: "Amount must be a number",
             })
         } else 
-        if (this.state.totalAmount <= 0 ) {
+        if (value <= 0 ) {
             this.setState({
                 amountError: "Amount must be greater than 0",
             })
