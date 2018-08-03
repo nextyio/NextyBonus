@@ -45,7 +45,7 @@ export default class extends LoggedInPage {
         this.props.getFixedPercent().then((_percent) => {
             this.setState({
                 currentPercent: _percent,
-                setPercent: _percent
+                setPercent: 100
             })
             console.log("Percent " + _percent)
         })
@@ -116,8 +116,7 @@ export default class extends LoggedInPage {
                                 className= "defaultWidth"
                                 min={0}
                                 max={100}
-                                formatter={value => `${parseInt(value)}%`}
-                                parser={value => value.replace('%', '')}
+                                formatter={value => `${parseInt(value)}`}
                                 defaultValue= {Number(this.state.currentPercent)}
                                 //defaultValue= {100}
                                 value= {this.state.setPercent}
