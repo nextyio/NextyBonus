@@ -212,11 +212,9 @@ contract NextyBonus {
     }
     
     function memberWithdraw() onlyMember public {
-        require(!reEntrancyMutex);
-
         uint256 amount = unlockedAmount[msg.sender]; // Withdraw amount
         require(amount > 0);  
-
+        require(!reEntrancyMutex);
         reEntrancyMutex = true;
         
         withdrawnAmount[msg.sender] = withdrawnAmount[msg.sender].add(amount);
