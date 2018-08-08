@@ -33,9 +33,6 @@ export default createContainer(Component, (state) => {
         ownerWithdraw(_amount) {
             return contractService.ownerWithdraw(_amount)
         },
-        async createLockedAmount(address, amount, fixedPercent) {
-            return await contractService.createLockedAmount(address, amount, fixedPercent)
-        },
         removeBonusAmount(_address, _isSpecific, _amountId) {
             return contractService.removeBonusAmount(_address, _isSpecific, _amountId)
         },

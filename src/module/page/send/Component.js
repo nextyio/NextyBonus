@@ -289,8 +289,7 @@ export default class extends LoggedInPage {
 
         const self= this;
         console.log(this.state.toWallet + " " +this.state.amount + " " + this.state.setPercent)
-        //this.props.createLockedAmount(this.state.toWallet, this.state.amount, this.state.setPercent).then((result) => {
-        this.props.callFunction('createLockedAmount', [this.state.toWallet, this.state.amount*1e18, this.state.setPercent]).then((result) => {
+        this.props.callFunction('createLockedAmount', [this.state.toWallet, this.state.amount*1e18]).then((result) => {
             console.log("called Create func")
             if (!result) {
                 Message.error('Cannot send transaction!')
@@ -311,7 +310,6 @@ export default class extends LoggedInPage {
                 }
             });
         })
-        //setTimeout(this.loadData.bind(this), 6000);
     }
 
     numberDisplay(value) {
