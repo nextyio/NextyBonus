@@ -1,6 +1,7 @@
 import DepositPage from '@/module/page/deposit/Container'
 import WithdrawPage from '@/module/page/withdraw/Container'
 import AdminSendPage from '@/module/page/send/Container'
+import SetPercentPage from '@/module/page/percent/Container'
 import HistoryPage from '@/module/page/history/Container'
 import ReturnPage from '@/module/page/return/Container'
 import ClaimPage from '@/module/page/claim/Container'
@@ -41,6 +42,10 @@ export default [
     {
         path: '/login',
         page: LoginPage
+    },
+    {
+        path: '/percent',
+        page: SetPercentPage
     },
     {
         path: '/terms-conditions',

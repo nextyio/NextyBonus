@@ -7,6 +7,8 @@ contract NextyBonus {
     
     uint256 public constant BONUS_REMOVEALBE_DURATION= 180*24*60*60; // 180 days in second
     uint256 public constant LOCK_DURATION= 365*24*60*60; // 365 days in second
+    //uint256 public constant BONUS_REMOVEALBE_DURATION= 10; // 180 days in second
+    //uint256 public constant LOCK_DURATION= 20; // 365 days in second
     
     uint256 public FIXED_PERCENT; //not constant
     uint256 public totalAmount= 0;

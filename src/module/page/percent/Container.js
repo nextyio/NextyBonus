@@ -16,9 +16,6 @@ export default createContainer(Component, (state) => {
         async getBalance() {
             return await userService.getBalance()
         },
-        getWallet() {
-            return userService.getWallet()
-        },
         async callFunction(functionName, params) {
             return await contractService.callFunction(functionName, params)
         },
@@ -46,17 +43,11 @@ export default createContainer(Component, (state) => {
         },
 
         //Public Functions
-        updateStatus(_address) {
-            return contractService.updateStatus(_address)
+        getLockedAmount(_address) {
+            return contractService.getLockedAmount(_address)
         },
-        async getRemoveableAmount(_address) {
-            return await contractService.getRemoveableAmount(_address)
-        },
-        async getLockedAmount(_address) {
-            return await contractService.getLockedAmount(_address)
-        },
-        async getUnlockedAmount(_address) {
-            return await contractService.getUnlockedAmount(_address)
+        getUnlockedAmount(_address) {
+            return contractService.getUnlockedAmount(_address)
         },
         getWithdrawnAmount(_address) {
             return contractService.getWithdrawnAmount(_address)
@@ -82,8 +73,8 @@ export default createContainer(Component, (state) => {
         getEventCreatedSuccess() {
             return contractService.getEventCreatedSuccess()
         },
-        getEventMemberWithdraw() {
-            return contractService.getEventMemberWithdraw()
+        getEventChangePercentSuccess() {
+            return contractService.getEventChangePercentSuccess()
         },
         
     }

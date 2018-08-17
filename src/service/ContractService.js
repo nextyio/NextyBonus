@@ -104,15 +104,6 @@ export default class extends BaseService {
         return contract.setFixedPercent(percent)
     }
 
-    async createLockedAmount(address, amount, fixedPercent) {
-        const storeUser = this.store.getState().user
-        let {contract} = storeUser.profile
-        if (!contract) {
-            return
-        }
-        return contract.createLockedAmount(address, web3.toWei(amount, "ether"), fixedPercent)
-    }
-
     async removeBonusAmount(address, isSpecific, amountId) {
         const storeUser = this.store.getState().user
         let {contract} = storeUser.profile
@@ -306,6 +297,14 @@ export default class extends BaseService {
             return
         }
         return contract.RemovedSuccess()
+    }
+    getEventChangePercentSuccess() {
+        const storeUser = this.store.getState().user
+        let {contract, web3, wallet} = storeUser.profile
+        if (!contract) {
+            return
+        }
+        return contract.ChangePercentSuccess()
     }
 
 }

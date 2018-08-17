@@ -100,6 +100,11 @@ loadData() {
                         </Menu.Item>
                     }
                     { isAdmin &&
+                        <Menu.Item key="percent">
+                            <Icon type="wallet" /> {I18N.get('0011')}
+                        </Menu.Item>
+                    }
+                    { isAdmin &&
                         <Menu.Item key="deposit">
                             <Icon type="wallet" /> {I18N.get('0002')}
                         </Menu.Item>
@@ -129,6 +134,7 @@ loadData() {
             'deposit',
             'withdraw',
             'claim',
+            'percent',
         ], key)) {
             this.props.history.push('/' + e.key)
         }
@@ -156,7 +162,8 @@ loadData() {
             'send',
             'deposit',
             'withdraw',
-            'claim'
+            'claim',
+            'percent'
         ];
 
         if (!url) {

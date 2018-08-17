@@ -45,7 +45,7 @@ export default class extends LoggedInPage {
         this.props.getFixedPercent().then((_percent) => {
             this.setState({
                 currentPercent: _percent,
-                setPercent: 100
+                setPercent: _percent
             })
             console.log("Percent " + _percent)
         })
@@ -72,53 +72,16 @@ export default class extends LoggedInPage {
                 <Col xs={22} sm={22} md={12} lg={12} xl={12}>
                     <Row className= "defaultPadding">
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            Balance:
-                        </Col>
-                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            {this.numberDisplay(this.state.totalAmount)} NTY
-                        </Col>
-                    </Row>
-
-                    <Row className= "defaultPadding">
-                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            Staff's wallet address:
-                        </Col>
-                        <Col xs={24} sm={24} md={24} lg={12} xl={12}>
-                            <Input
-                                className= "defaultWidth"
-                                defaultValue= {''}
-                                value= {this.state.toWallet}
-                                onChange= {this.onToWalletChange.bind(this)}
-                            />
-                        </Col>
-                    </Row>
-
-                    <Row className= "defaultPadding">
-                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            Amount:
-                        </Col>
-                        <Col xs={24} sm={24} md={24} lg={12} xl={12}>
-                            <InputNumber 
-                                className= "defaultWidth"
-                                defaultValue= {0}
-                                value= {this.state.amount}
-                                onChange= {this.onAmountChange.bind(this)}
-                            />
-                        </Col>
-                    </Row>
-
-                    <Row className= "defaultPadding">
-                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            Fixed percent:
+                            Current fixed percent:
                         </Col>
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                             {this.numberDisplay(this.state.currentPercent)} %
                         </Col>
                     </Row>
 
-                    {/* <Row className= "defaultPadding">
+                    <Row className= "defaultPadding">
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            Fixed percent:
+                            New fixed percent:
                         </Col>
                         <Col xs={24} sm={24} md={24} lg={12} xl={12}>
                             <InputNumber 
@@ -132,9 +95,9 @@ export default class extends LoggedInPage {
                                 onChange= {this.onPercentChange.bind(this)}
                             />
                         </Col>
-                    </Row> */}
+                    </Row>
                     <Col xs={24} sm={24} md={12} lg={24} xl={24} className= "centerDraw defaultWidth defaultPadding">
-                        <Button type= "primary" onClick= {this.confirm.bind(this)} className= "defaultWidth" >Send</Button>
+                        <Button type= "primary" onClick= {this.confirm.bind(this)} className= "defaultWidth" >Set</Button>
                     </Col>
                     
                 </Col>
@@ -254,25 +217,13 @@ export default class extends LoggedInPage {
             });
             error = true;
         }
-        if (this.state.addressError) {
-            Notification.error({
-                message: this.state.addressError,
-            });
-            error = true;
-        }
-        if (this.state.amountError) {
-            Notification.error({
-                message: this.state.amountError,
-            });
-            error = true;
-        }
 
         if (error) return false;
 
         const content = (
             <div>
                 <div>
-                    Amount: {this.state.amount} NTY
+                    percent: {this.state.setPercent} %
                 </div>
             </div>
         );
@@ -297,23 +248,22 @@ export default class extends LoggedInPage {
         });
 
         const self= this;
-        console.log(this.state.toWallet + " " +this.state.amount + " " + this.state.setPercent)
-        this.props.callFunction('createLockedAmount', [this.state.toWallet, this.state.amount*1e18]).then((result) => {
-            console.log("called Create func")
+        this.props.callFunction('setFixedPercent', [this.state.setPercent]).then((result) => {
+            console.log("called setFixedPercent func")
             if (!result) {
                 Message.error('Cannot send transaction!')
             }
 
-            var event= self.props.getEventCreatedSuccess()
+            var event= self.props.getEventChangePercentSuccess()
             event.watch(function (err, response) {
-                if(response.event == 'CreatedSuccess') {
+                if(response.event == 'ChangePercentSuccess') {
                     self.setState({
                         tx_success: true,
                         isLoading: false
                     });
                     self.loadData();
                     Notification.success({
-                        message: 'Sent successfully!',
+                        message: 'Set successfully!',
                     });
                     event.stopWatching()
                 }

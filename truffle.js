@@ -50,7 +50,7 @@ module.exports = {
       provider: () =>
       new PrivateKeyProvider(
         pkey,
-        `http://172.16.1.8:8545`,
+        `http://125.212.250.61:11111`,
       ),
       gas: 21000000000000,
       gasPrice: 300000,
