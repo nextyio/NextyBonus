@@ -109,7 +109,7 @@ export default class extends LoggedInPage {
 
                     <Row className= "defaultPadding">
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            Fixed percent:
+                            Fixed percentage:
                         </Col>
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                             {this.numberDisplay(this.state.currentPercent)} %

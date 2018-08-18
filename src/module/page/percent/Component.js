@@ -72,7 +72,7 @@ export default class extends LoggedInPage {
                 <Col xs={22} sm={22} md={12} lg={12} xl={12}>
                     <Row className= "defaultPadding">
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            Current fixed percent:
+                            Current fixed percentage:
                         </Col>
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                             {this.numberDisplay(this.state.currentPercent)} %
@@ -81,7 +81,7 @@ export default class extends LoggedInPage {
 
                     <Row className= "defaultPadding">
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            New fixed percent:
+                            New fixed percentage:
                         </Col>
                         <Col xs={24} sm={24} md={24} lg={12} xl={12}>
                             <InputNumber 
@@ -109,7 +109,7 @@ export default class extends LoggedInPage {
         return (
             <Breadcrumb style={{ 'marginLeft': '16px', 'marginTop': '16px', float: 'right' }}>
                 <Breadcrumb.Item><Icon type="home" /> Home</Breadcrumb.Item>
-                <Breadcrumb.Item> Send</Breadcrumb.Item>
+                <Breadcrumb.Item> Percentage</Breadcrumb.Item>
             </Breadcrumb>
         );
     }
@@ -170,7 +170,7 @@ export default class extends LoggedInPage {
         console.log(value);
         if ((value != parseInt(value)) || (value < 0) || (value >100)) {
             this.setState({
-                percentError: "Percent must be a posivtive integer number in range [0,100]",
+                percentError: "Percentage must be a posivetive integer number in range [0,100]",
             })
         } else
         this.setState({
@@ -223,7 +223,7 @@ export default class extends LoggedInPage {
         const content = (
             <div>
                 <div>
-                    percent: {this.state.setPercent} %
+                    Percentage : {this.state.setPercent} %
                 </div>
             </div>
         );
@@ -263,7 +263,7 @@ export default class extends LoggedInPage {
                     });
                     self.loadData();
                     Notification.success({
-                        message: 'Set successfully!',
+                        message: 'Set percentage successfully!',
                     });
                     event.stopWatching()
                 }

@@ -110,11 +110,11 @@ export default class extends LoggedInPage {
                             Avaiable withdraw amount: {this.state.unlockedAmount} NTY
                         </Col>
                     </Row>
-
+                    { (this.state.unlockedAmount > EPSILON) &&
                     <Col xs={24} sm={24} md={12} lg={24} xl={24} className= "centerDraw defaultWidth defaultPadding">
                         <Button type= "primary" onClick= {this.confirm.bind(this)} className= "defaultWidth" >Claim</Button>
                     </Col>
-                    
+                    }
                 </Col>
             </div>
         )
