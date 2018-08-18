@@ -107,7 +107,7 @@ export default class extends LoggedInPage {
 
                     <Row className= "defaultPadding">
                         <Col xs={24} sm={24} md={12} lg={24} xl={24} className= "centerDraw defaultWidth defaultPadding textBlue">
-                            Avaiable withdraw amount: {this.state.unlockedAmount} NTY
+                            Available withdraw amount: {this.state.unlockedAmount} NTY
                         </Col>
                     </Row>
                     { (this.state.unlockedAmount > EPSILON) &&
