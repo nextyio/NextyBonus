@@ -15,7 +15,6 @@ export default class extends BaseComponent {
                             <div className="d_footerSection">
                                 <b>WHAT IS SMARTBONUS?</b>
                                 <p className="margin-left-15">Apart from salary, Nexty offers NTY as monthly bonus for the project team members that is equal to approximately 70% standard salary. The bonus is distributed from the bonus pool of 2,000,000 pNTY, disbursed via Smart Contract in particular stages.</p>
-                                <a href="/assets/Nexty-Smart-Staking-How-to-use.pdf" target="_blank"><b>HOW TO USE</b></a>
                             </div>
                         </Col>
                         <Col xs={24} sm={24} md={12} span={12}>

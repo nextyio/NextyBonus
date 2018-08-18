@@ -13,7 +13,7 @@ const MenuItemGroup = Menu.ItemGroup
 
 export default class extends BaseComponent {
     componentDidMount() {
-        document.title = "Smart Staking"
+        document.title = "Smart Bonus"
     }
 
     buildAcctDropdown() {
