@@ -170,7 +170,7 @@ export default class extends LoggedInPage {
         console.log(value);
         if ((value != parseInt(value)) || (value < 0) || (value >100)) {
             this.setState({
-                percentError: "Percentage must be a posivetive integer number in range [0,100]",
+                percentError: "Percentage must be a positive integer number in range [0,100]",
             })
         } else
         this.setState({
