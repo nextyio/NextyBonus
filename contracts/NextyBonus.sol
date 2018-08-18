@@ -266,12 +266,13 @@ contract NextyBonus {
         uint256 endTime;
         uint256  value;
         StatusType  lockStatus;
-        bool removeable;
+        bool removeable = false;
         
         startTime = bonusAmount[_address][_id].startTime;
         endTime = bonusAmount[_address][_id].endTime;
         value = bonusAmount[_address][_id].value;
         lockStatus = bonusAmount[_address][_id].lockStatus;
+        if (value > 0)
         removeable = ((lockStatus == StatusType.Locked) && (startTime + BONUS_REMOVEALBE_DURATION > now));
         
         return (startTime, endTime, value, uint256(lockStatus), removeable);
