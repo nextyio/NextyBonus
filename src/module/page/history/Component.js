@@ -64,6 +64,7 @@ export default class extends LoggedInPage {
     }
 
     comfirm(dataSource, index) {
+        if (!this.props.is_admin) return false;
         var removeable= dataSource[index][4]; //get bool removeable from smart contract output
         if (!removeable) return false;
         const content = (

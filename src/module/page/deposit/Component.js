@@ -71,6 +71,7 @@ export default class extends LoggedInPage {
                                 className= "defaultWidth"
                                 defaultValue= {0}
                                 value= {this.state.amount}
+                                min={0}
                                 onChange= {this.onAmountChange.bind(this)}
                             />
                         </Col>
