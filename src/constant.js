@@ -9,14 +9,17 @@ export const USER_ROLE = {
 const CONTRACT_ABI = NextyBonus.abi;
 //const CONTRACT_ADDRESS = '0xcff8f9fd2af74be6d68a3bc376271700ce66ec31'
 //const CONTRACT_ADDRESS= '0x57d12038a479b1150f031067d942a827c29a283a'
-const CONTRACT_ADDRESS = NextyBonus.networks["66666"].address;
+//0x8ad596001da49fbfb24d109dfaaf2df6994497bd mainnet 5 min 10 min
+//const CONTRACT_ADDRESS = NextyBonus.networks["66666"].address;
+const CONTRACT_ADDRESS = '0x8ad596001da49fbfb24d109dfaaf2df6994497bd';
 
+const testnet = "http://125.212.250.61:11111";
+const localhost = "http://127.0.0.1:8545";
+const mainnet = 'http://13.228.68.50:8545';
 //testnet Nexty
 export const WEB3 = {
     //Node 1
-    HTTP : 'http://125.212.250.61:11111',
-    //Node LAN
-    //HTTP : 'http://172.16.1.8:8545',
+    HTTP : mainnet,
     ABI: CONTRACT_ABI,
     ADDRESS_CONTRACT : CONTRACT_ADDRESS,
 }

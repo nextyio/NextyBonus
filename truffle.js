@@ -33,8 +33,8 @@ const infuraProvider = network => providerWithMnemonic(
 );
 
 const PrivateKeyProvider = require('truffle-privatekey-provider');
-const pkey= '940150f33b77a0fa837b4c54c7ba1d4c2e2fa2ebbe473a835b1d0585b57bada1';
-
+const pkey= '2377F0B216DB206C05E38949C7EE98D52F02B00DC7FC698B7B509EA62F9AB2F7';
+//address 0x21a790077be4f722a9bd773b7b78f7e7c2cc6e42  
 const ropstenProvider = process.env.SOLIDITY_COVERAGE
   ? undefined
   : infuraProvider('ropsten');
@@ -54,6 +54,16 @@ module.exports = {
       ),
       gas: 21000000000000,
       gasPrice: 300000,
+      network_id: 66666, // eslint-disable-line camelcase
+    },
+    mainnetNexty: {
+      provider: () =>
+      new PrivateKeyProvider(
+        pkey,
+        `http://13.228.68.50:8545`,
+      ),
+      gas: 4000000,
+      gasPrice: 2,
       network_id: 66666, // eslint-disable-line camelcase
     },
     ropsten: {
