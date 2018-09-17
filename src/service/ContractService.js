@@ -203,7 +203,6 @@ export default class extends BaseService {
                 ...bonusHistoryById
             })
         }
-
         return history;
     }
 

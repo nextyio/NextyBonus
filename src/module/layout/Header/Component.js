@@ -1,6 +1,6 @@
 import React from 'react'
 import BaseComponent from '@/model/BaseComponent'
-import { Layout, Menu, Icon, Badge, Avatar, Modal, Dropdown, Button } from 'antd'
+import { Row, Col, Layout, Menu, Icon, Badge, Avatar, Modal, Dropdown, Button } from 'antd'
 import _ from 'lodash'
 import I18N from '@/I18N'
 import './style.scss'
@@ -14,6 +14,9 @@ const MenuItemGroup = Menu.ItemGroup
 export default class extends BaseComponent {
     componentDidMount() {
         document.title = "Smart Bonus"
+        this.props.getWallet().then((_wallet) => {
+            this.setState({ wallet : _wallet });
+        })
     }
 
     buildAcctDropdown() {
@@ -49,11 +52,17 @@ export default class extends BaseComponent {
         const isLogin = this.props.isLogin;
         if (isLogin) {
             return (
-
-                  <Button className="right-side" onClick={this.logout.bind(this)} ghost>
-                      <Icon type="logout" />{I18N.get('0204')}
-                  </Button>
-
+                <Row>
+                    <Col xs={24} sm={24} md={12} lg={12} xl={12} >
+                        <span className="wallet"> {this.state.wallet}
+                        </span>
+                    </Col>
+                    <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                        <Button className="right-side" onClick={this.logout.bind(this)} >
+                            <Icon type="logout" />{I18N.get('0204')}
+                        </Button>
+                    </Col>
+                </Row>
             )
         } else {
             return (

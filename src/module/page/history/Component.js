@@ -4,11 +4,21 @@ import moment from 'moment/moment'
 
 import './style.scss'
 
-import { Col, Row, Icon, Input, Breadcrumb, Table, Button, Modal, Notification } from 'antd'
+import { Col, Row, Icon, Input, Breadcrumb, Table, Button, Modal, Notification, DatePicker  } from 'antd'
 const Search = Input.Search;
+const { MonthPicker, RangePicker } = DatePicker;
+
+const dateFormat = 'DD/MM/YYYY';
+const monthFormat = 'YYYY/MM';
+
+import NumberFormat from 'react-number-format';
 
 export default class extends LoggedInPage {
     componentDidMount() {
+        this.setState({ 
+            searchFrom : Number(moment('01/01/2018')),
+            searchTo : Number(moment(new Date()))
+        });
         window.addEventListener('resize', this.handleWindowSizeChange); 
         this.props.getWallet().then((_wallet) => {
             this.setState({ searchWallet : _wallet });
@@ -32,7 +42,8 @@ export default class extends LoggedInPage {
 
         this.props.getFixedHistory(_wallet).then((_history) => {
             this.setState({
-                history: _history
+                history: _history,
+                searchHistory : _history
             })
         })
     }
@@ -101,7 +112,7 @@ export default class extends LoggedInPage {
 
              var event= self.props.getEventRemovedSuccess()
              event.watch(function (err, response) {
-                 console.log(response.args._amount.toString())
+                 //conssole.log(response.args._amount.toString())
                  if (response.event == 'RemovedSuccess') {
                     if (Number(response.args._amount) == 0) {
                         self.loadData(self.state.searchWallet);
@@ -123,8 +134,8 @@ export default class extends LoggedInPage {
 
     renderReturnButton(dataSource, index){
         var removeable= dataSource[index][4]; //get bool removeable from smart contract output
-        console.log(index)
-        //console.log(dataSource[index])
+        //conssole.log(index)
+        ////conssole.log(dataSource[index])
         if (removeable) 
         return (
             <div><Button type= "primary" className= "defaultWidth" >Remove</Button></div>
@@ -139,11 +150,11 @@ export default class extends LoggedInPage {
     }
 
     renderAmount(amountString, decimalNumber, convert, dataSource, record) {
-        
-        var i= record.index;
+        var i= Number(record.index);
         if (i % 2 == 1) i--;
-        var a= Number(dataSource[i][2].toString());
-        var b= Number(dataSource[i+1][2].toString());
+        //conssole.log(i, dataSource[i])
+        var a= Number(dataSource[i][2]);
+        var b= Number(dataSource[i+1][2]);
         var aPercent= this.numberDisplay(a/(a+b) * 100)
         var bPercent= this.numberDisplay(b/(a+b) * 100)
         
@@ -151,12 +162,18 @@ export default class extends LoggedInPage {
         if (convert == 'toEther') mul= 1e-18
         if (convert == 'toWei') mul= 1e18
         return (
-                <p>{(parseFloat(amountString * mul).toFixed(decimalNumber))} NTY/{record.index % 2 == 0 ? aPercent : bPercent} %</p>
+                <p>{(this.numberDisplay(amountString * mul))} NTY/{record.index % 2 == 0 ? aPercent : bPercent} %</p>
         )
     }
 
+    inRange(row, from, to) {
+        var inrange = (Number(from) < 1000* Number(row[0])) && (Number(to) > 1000* Number(row[0]))
+        ////conssole.log(this.state.searchFrom,this.state.searchTo,Number(row[0]) *1000, inrange)
+        return inrange
+        
+    }
+
     renderTable() {
-        var dataSource = this.state.history;
 
         var columns = [
             
@@ -181,7 +198,7 @@ export default class extends LoggedInPage {
                 dataIndex: 2,
                 key: 'amount',
                 render: (amount, record) => {
-                    return this.renderAmount(amount, 2, 'toEther', dataSource, record)
+                    return this.renderAmount(amount, 2, 'toEther', this.state.searchHistory, record)
                 }
             },
             {
@@ -201,21 +218,48 @@ export default class extends LoggedInPage {
             dataIndex: 'index',
             key: 'index',
             render: (record) => {
-                return this.renderReturnButton(this.state.history, record)
+                return this.renderReturnButton(this.state.searchHistory, record)
             }
         })
 
         return (
             <Table   
                 onRow={(record) => {
+                    ////conssole.log(Number(this.state.searchFrom),record[0].toString())
+                    //if ((Number(this.state.searchFrom) < 1000* Number(record[0])) && (Number(this.state.searchTo) > 1000* Number(record[0])))
                     return {
-                        onClick: () => {this.comfirm(this.state.history, record.index)},       // click row, index =  rowNumber
+                        onClick: () => {this.comfirm(this.state.searchHistory, record.index)},       // click row, index =  rowNumber
                     };
                 }} 
                 rowClassName={(record, index) => index % 2 == 1 ? 'highlightRow' : '' }
-                pagination= {false} dataSource= {this.state.history} columns= {columns} scroll= { {x: this.state.scroll} } 
+                pagination={{ pageSize: 20 }} dataSource= {this.state.searchHistory} columns= {columns} scroll= { {x: this.state.scroll} } 
             />
         );
+    }
+
+    rangeChange(e) {
+        this.setState({
+            searchFrom : Number(moment(e[0])),
+            searchTo : Number(moment(e[1]))
+        })
+        var dataSource = []
+        var self = this
+        var length = 0
+        if (this.state.history)
+        this.state.history.map(function(row){
+                if (self.inRange(row,Number(moment(e[0])), Number(moment(e[1])))) {
+                    dataSource.push(row)
+                    dataSource[length]['index'] = length
+                    length++
+                }
+            }
+        );
+        this.setState ({
+            searchHistory : dataSource
+        })
+        //conssole.log("datasource", dataSource)
+        ////conssole.log(Number(moment(e[0])))
+        ////conssole.log(Number(moment(e[1])))
     }
 
     ord_renderContent () {
@@ -227,9 +271,14 @@ export default class extends LoggedInPage {
                 <Search 
                     placeholder= "Wallet address"
                     onSearch= {value => this.searchByAddress(value)}
-                    style= { { width: 200 } }
+                    style= { { width: 400 } }
                 />
                 }
+                <RangePicker 
+                    onChange = {this.rangeChange.bind(this)}
+                    defaultValue={[moment('01/01/2018', dateFormat), moment(new Date(), dateFormat)]}
+                    format={dateFormat}
+                />
                     { this.renderTable() }
                 </Col>
             </Row>
@@ -246,6 +295,7 @@ export default class extends LoggedInPage {
     }
 
     numberDisplay(value) {
-        return Number(value).toFixed(2)
+        return <NumberFormat value={Number(value).toFixed(2)} displayType={'text'} thousandSeparator={true} />
+        //return Number(value).toFixed(2)
     }
 }

@@ -69,21 +69,21 @@ export default class extends LoggedInPage {
                 <Col xs={1} sm={1} md={6} lg={6} xl={6}>
                 </Col>
 
-                <Col xs={22} sm={22} md={12} lg={12} xl={12}>
+                <Col xs={22} sm={22} md={16} lg={16} xl={16}>
                     <Row className= "defaultPadding">
-                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                        <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                             Balance:
                         </Col>
-                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                        <Col xs={24} sm={24} md={16} lg={16} xl={16}>
                             {this.numberDisplay(this.state.totalAmount)} NTY
                         </Col>
                     </Row>
 
                     <Row className= "defaultPadding">
-                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                        <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                             Staff's wallet address:
                         </Col>
-                        <Col xs={24} sm={24} md={24} lg={12} xl={12}>
+                        <Col xs={24} sm={24} md={16} lg={16} xl={16}>
                             <Input
                                 className= "defaultWidth"
                                 defaultValue= {''}
@@ -94,10 +94,10 @@ export default class extends LoggedInPage {
                     </Row>
 
                     <Row className= "defaultPadding">
-                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                        <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                             Amount:
                         </Col>
-                        <Col xs={24} sm={24} md={24} lg={12} xl={12}>
+                        <Col xs={24} sm={24} md={16} lg={16} xl={16}>
                             <InputNumber 
                                 className= "defaultWidth"
                                 defaultValue= {0}
@@ -108,10 +108,10 @@ export default class extends LoggedInPage {
                     </Row>
 
                     <Row className= "defaultPadding">
-                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                        <Col xs={24} sm={24} md={8} lg={8} xl={8}>
                             Fixed percentage:
                         </Col>
-                        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                        <Col xs={24} sm={24} md={16} lg={16} xl={16}>
                             {this.numberDisplay(this.state.currentPercent)} %
                         </Col>
                     </Row>

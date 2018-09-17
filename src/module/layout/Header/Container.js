@@ -18,6 +18,9 @@ export default createContainer(Component, (state) => {
                 message.success('Log out successfully');
                 userService.path.push('/login/');
             }
-        }
+        },
+        async getWallet() {
+            return await userService.getWallet()
+        },
     };
 });

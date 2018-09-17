@@ -4,6 +4,7 @@ import LoggedInPage from '../LoggedInPage';
 import './style.scss'
 
 import { Col, Row, Icon, Form, Notification, Button, Breadcrumb, Modal } from 'antd'
+import NumberFormat from 'react-number-format';
 
 const EPSILON= 1e-10
 
@@ -19,25 +20,25 @@ export default class extends LoggedInPage {
 
         this.props.getRemoveableAmount(this.props.profile.wallet.getAddressString()).then((_amount) => {
             this.setState({
-                removeableAmount: this.numberDisplay(Number(_amount)*1e-18),
+                removeableAmount: Number(_amount)*1e-18,
             })
         })
 
         this.props.getLockedAmount(this.props.profile.wallet.getAddressString()).then((_amount) => {
             this.setState({
-                lockedAmount: this.numberDisplay(Number(_amount)*1e-18),
+                lockedAmount: Number(_amount)*1e-18,
             })
         })
 
         this.props.getUnlockedAmount(this.props.profile.wallet.getAddressString()).then((_amount) => {
             this.setState({
-                unlockedAmount: this.numberDisplay(Number(_amount)*1e-18),
+                unlockedAmount: Number(_amount)*1e-18,
             })
         })
 
         this.props.getWithdrawnAmount(this.props.profile.wallet.getAddressString()).then((_amount) => {
             this.setState({
-                withdrawnAmount: this.numberDisplay(Number(_amount)*1e-18),
+                withdrawnAmount: Number(_amount)*1e-18,
             })
         })
 
@@ -74,7 +75,7 @@ export default class extends LoggedInPage {
                             Locked amount
                         </Col>
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            {this.state.lockedAmount} NTY
+                            {this.numberDisplay(this.state.lockedAmount)} NTY
                         </Col>
                     </Row>
 
@@ -83,13 +84,13 @@ export default class extends LoggedInPage {
                             Withdrawn amount
                         </Col>
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            {this.state.withdrawnAmount} NTY
+                            {this.numberDisplay(this.state.withdrawnAmount)} NTY
                         </Col>
                     </Row>
 
                     <Row className= "defaultPadding">
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            a amount
+                            Fixed amount
                         </Col>
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                             {this.numberDisplay(this.state.lockedAmount - this.state.removeableAmount)} NTY
@@ -98,16 +99,16 @@ export default class extends LoggedInPage {
 
                     <Row className= "defaultPadding">
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            b amount
+                            Receivable amount 
                         </Col>
                         <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                            {this.state.removeableAmount} NTY
+                            {this.numberDisplay(this.state.removeableAmount)} NTY
                         </Col>
                     </Row>
 
                     <Row className= "defaultPadding">
                         <Col xs={24} sm={24} md={12} lg={24} xl={24} className= "centerDraw defaultWidth defaultPadding textBlue">
-                            Available withdraw amount: {this.state.unlockedAmount} NTY
+                            Available withdraw amount: {this.numberDisplay(this.state.unlockedAmount)} NTY
                         </Col>
                     </Row>
                     { (this.state.unlockedAmount > EPSILON) &&
@@ -271,6 +272,7 @@ export default class extends LoggedInPage {
     }
 
     numberDisplay(value) {
-        return Number(value).toFixed(2)
+        return <NumberFormat value={Number(value).toFixed(2)} displayType={'text'} thousandSeparator={true} />
+        //return Number(value).toFixed(2)
     }
 }
