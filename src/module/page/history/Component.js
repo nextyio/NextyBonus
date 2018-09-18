@@ -17,7 +17,7 @@ export default class extends LoggedInPage {
     componentDidMount() {
         this.setState({ 
             searchFrom : Number(moment('01/01/2018')),
-            searchTo : Number(moment(new Date()))
+            searchTo : Number(moment(moment(new Date()).format("DD/MM/YYYY")))
         });
         window.addEventListener('resize', this.handleWindowSizeChange); 
         this.props.getWallet().then((_wallet) => {
@@ -167,7 +167,11 @@ export default class extends LoggedInPage {
     }
 
     inRange(row, from, to) {
-        var inrange = (Number(from) < 1000* Number(row[0])) && (Number(to) > 1000* Number(row[0]))
+        var fromDate = moment(from).add('days',1).utc().format('YYYYMMDD')
+        var toDate = moment(to).utc().format('YYYYMMDD')
+        var rowDate = moment(Number(row[0] * 1000)).format('YYYYMMDD')
+        //console.log(fromDate, toDate, rowDate)
+        var inrange = (fromDate <= rowDate) && (toDate >= rowDate)
         ////conssole.log(this.state.searchFrom,this.state.searchTo,Number(row[0]) *1000, inrange)
         return inrange
         
@@ -238,16 +242,18 @@ export default class extends LoggedInPage {
     }
 
     rangeChange(e) {
+        var from = e[0] ? Number(moment(e[0])) : Number(moment('01/01/2018'))
+        var to = e[1] ? Number(moment(e[1])) : Number(moment(moment(new Date()).format("DD/MM/YYYY")))
         this.setState({
-            searchFrom : Number(moment(e[0])),
-            searchTo : Number(moment(e[1]))
+            searchFrom : from,
+            searchTo : to
         })
         var dataSource = []
         var self = this
         var length = 0
         if (this.state.history)
         this.state.history.map(function(row){
-                if (self.inRange(row,Number(moment(e[0])), Number(moment(e[1])))) {
+                if (self.inRange(row, from, to)) {
                     dataSource.push(row)
                     dataSource[length]['index'] = length
                     length++
