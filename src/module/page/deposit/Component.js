@@ -72,6 +72,8 @@ export default class extends LoggedInPage {
                                 defaultValue= {0}
                                 value= {this.state.amount}
                                 min={0}
+                                formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                parser={value => value.replace(/\$\s?|(,*)/g, '')}
                                 onChange= {this.onAmountChange.bind(this)}
                             />
                         </Col>
