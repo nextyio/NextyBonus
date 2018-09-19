@@ -41,9 +41,20 @@ export default class extends LoggedInPage {
         this.props.callFunction('updateStatus', [_wallet])
 
         this.props.getFixedHistory(_wallet).then((_history) => {
-            this.setState({
+            var dataSource = []
+            var self = this
+            var length = 0
+            _history.map(function(row){
+                    if (self.inRange(row, self.state.searchFrom, self.state.searchTo)) {
+                        dataSource.push(row)
+                        dataSource[length]['index'] = length
+                        length++
+                    }
+                }
+            );
+            this.setState ({
                 history: _history,
-                searchHistory : _history
+                searchHistory : dataSource
             })
         })
     }
