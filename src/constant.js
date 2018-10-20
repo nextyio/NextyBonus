@@ -11,7 +11,7 @@ const CONTRACT_ABI = NextyBonus.abi;
 //const CONTRACT_ADDRESS= '0x57d12038a479b1150f031067d942a827c29a283a'
 //0x8ad596001da49fbfb24d109dfaaf2df6994497bd mainnet 5 min 10 min
 //const CONTRACT_ADDRESS = NextyBonus.networks["66666"].address;
-const CONTRACT_ADDRESS = '0x8ad596001da49fbfb24d109dfaaf2df6994497bd';
+const CONTRACT_ADDRESS = '0x2ad43c9aec2db323c51a10192785c59825b9fe1a';
 
 const testnet = "http://125.212.250.61:11111";
 const localhost = "http://127.0.0.1:8545";
