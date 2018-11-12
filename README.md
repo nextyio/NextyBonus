@@ -3,10 +3,16 @@ Reward project for Nexty development Team
 
 This is Nexty Bonus which based on webpack + react + redux.
 
-how to run
-cd NextyBonus
-npm i
-npm start
+#How to run
+    cd NextyBonus
+    npm i
+    npm start
+
+#How to build
+    cd NextyBonus
+    npm i
+    npm build
+    point Nginx to root as NextyBonus/build/
 
 # front-end will running on http://localhost:3008
 
