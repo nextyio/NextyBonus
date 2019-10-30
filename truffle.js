@@ -60,7 +60,7 @@ module.exports = {
       provider: () =>
       new PrivateKeyProvider(
         pkey,
-        `http://13.228.68.50:8545`,
+        `https://rpc.nexty.io`,
       ),
       gas: 4000000,
       gasPrice: 2,

@@ -13,6 +13,7 @@ export default {
     '0011': 'Set Percentage',
     '0012': 'Setting Packages',
     '0013': 'Deposit',
+    '0014': 'Set Extra Bonus',
 
 
     '0100': 'Developer',

@@ -232,6 +232,16 @@ export default class extends BaseService {
         }
         return contract.FIXED_PERCENT()
     }
+    
+
+    async getExtraBonusPercent() {
+        const storeUser = this.store.getState().user
+        let {contract} = storeUser.profile
+        if (!contract) {
+            return
+        }
+        return contract.EX_BONUS_PERCENT()
+    }
 
     async getTotalAmount() {
         const storeUser = this.store.getState().user

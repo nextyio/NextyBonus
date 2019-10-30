@@ -164,18 +164,17 @@ export default class extends LoggedInPage {
         var i= Number(record.index);
         if (i % 2 == 1) i--;
         //conssole.log(i, dataSource[i])
-        var a= Number(dataSource[i][2]);
-        var b= Number(dataSource[i+1][2]);
-        var aPercent= this.numberDisplay(a/(a+b) * 100)
-        var bPercent= this.numberDisplay(b/(a+b) * 100)
+        var aPercent= Number(dataSource[i][5]);
+        var bPercent= Number(dataSource[i+1][5]);
         
         var mul=1
         if (convert == 'toEther') mul= 1e-18
         if (convert == 'toWei') mul= 1e18
         return (
-                <p>{(this.numberDisplay(amountString * mul))} NTY/{record.index % 2 == 0 ? aPercent : bPercent} %</p>
+            <p>{(this.numberDisplay(amountString * mul))} NTY/{record.index % 2 == 0 ? aPercent : bPercent} %</p>
         )
     }
+    
 
     inRange(row, from, to) {
         var fromDate = moment(from).format('YYYYMMDD')
@@ -213,6 +212,7 @@ export default class extends LoggedInPage {
                 dataIndex: 2,
                 key: 'amount',
                 render: (amount, record) => {
+                    console.log(record);
                     return this.renderAmount(amount, 2, 'toEther', this.state.searchHistory, record)
                 }
             },
